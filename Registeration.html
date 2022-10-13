@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="indigo">
+    <!--Import Google Icon Font             -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS          -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript   -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <script defer src="face-api.min.js"></script>
+    <script defer src="Regeisteration_script.js"></script>
+    <title>Document</title>
+    <style>
+        /* .row .col {
+            //padding: 1px !important;
+            margin: 1px !important;
+        } */
+        @import url(http://fonts.googleapis.com/css?family=Roboto:400,700,300);
+
+        .btn {
+            border-radius: 0;
+        }
+
+        header,
+        main,
+        footer {
+            padding-left: 300px;
+        }
+
+        @media only screen and (max-width : 992px) {
+
+            header,
+            main,
+            footer {
+                padding-left: 0;
+            }
+        }
+    </style>
+    <!-- <script>
+        var elem = document.querySelector('.sidenav');
+        var instance = new M.Sidenav(elem);
+        $(function () {
+            $('.sidenav').sidenav();
+            // debugging && console.log($('.sidenav'))
+        });
+        $(document).ready(function () {
+            // $('select').formSelect();
+        });
+    </script> -->
+</head>
+
+<body>
+    <!-- playing and training section -->
+
+    <nav class="nav-wraper">
+        <div class="container">
+            <ul id="slide-out" class="sidenav">
+
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/Registeration.html">Registeration</a></li>
+                <li><a href="/Modifing.html">Modifing</a></li>
+                <li><a href="/Registed.html">Registed</a></li>
+                <li><a href="/New_session.html">New_session</a></li>
+                <li><a href="/Setting.html">Setting</a></li>
+                <li>
+                    <div class="divider"></div>
+                </li>
+                <li><a class="subheader">Subheader</a></li>
+                <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
+            </ul>
+            <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <a href="#" class="brand-logo">Registeration</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/Registeration.html">Registeration</a></li>
+                <li><a href="/Modifing.html">Modifing</a></li>
+                <li><a href="/Registed.html">Registed</a></li>
+                <li><a href="/New_session.html">New_session</a></li>
+                <li><a href="/Setting.html">Setting</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container center-align" id="main_content">
+        <br />
+        <br />
+        <br />
+        <div class="row">
+            <form action="">
+                <div class="row">
+                    <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                    <div class="btn-floating" onclick="$('#cam').click()"><i class="material-icons">camera_alt</i></div>
+                </div>
+                <div class="row">
+                    <div class="input-field">
+                        <input value="" id="Name" type="text" class="validate">
+                        <label class="active" for="Name">Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field">
+                        <input value="" id="Address" type="text" class="validate">
+                        <label class="active" for="Address">Address</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field">
+                        <input value="" id="Location" type="text" class="validate">
+                        <label class="active" for="Location">Location</label>
+                    </div>
+                    <div class="btn-floating tooltipped" data-position="bottom" data-tooltip="fill with current location" onclick="fill_with_current_location()"><i class="material-icons">my_location</i></div>
+                </div>
+                <div class="row">
+                    <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
+                    <div class="input-field">
+                        <select id="Class">
+                            <option value="?" disabled selected>Choose your option</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                        <label for="Class">Class</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn" style="border-radius: 18px; " onclick="submit_registration()" >Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var debugging=true;
+        let camera_button = document.querySelector("#start-camera");
+        let video = document.querySelector("#video");
+        let click_button = document.querySelector("#click-photo");
+        let canvas = document.querySelector("#canvas");
+
+        camera_button.addEventListener('click', async function () {
+            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            video.srcObject = stream;
+        });
+
+        click_button.addEventListener('click', function () {
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            let image_data_url = canvas.toDataURL('image/jpeg');
+
+            // data url of the image
+            debugging && console.log(image_data_url);
+        });
+        var db;
+        var request = window.indexedDB.open("sefain_brain")
+        request.onupgradeneeded=(event)=>{
+            db=event.target.result;
+            let children=db.createObjectStore("children",{keyPath:"Name"});
+            //TODO : ask if have db.json to import or no
+            debugging && console.log("request.onupgradeneeded called");
+        }
+
+        request.onsuccess=(event)=>{
+            db=event.target.result;
+            debugging && console.log("request.onsuccess called");
+
+        }
+
+        request.onerror=(event)=>{
+            debugging && console.log("request.onerror called");
+            debugging && console.log(event.target.result);
+        }
+
+
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>
