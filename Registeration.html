@@ -15,13 +15,9 @@
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <link rel="manifest" href="manifest.json">
     <script defer src="face-api.min.js"></script>
-    <script defer src="Regeisteration_script.js"></script>
+    <!-- <script defer src="Regeisteration_script.js"></script> -->
     <title>Document</title>
     <style>
-        /* .row .col {
-            //padding: 1px !important;
-            margin: 1px !important;
-        } */
         @import url(http://fonts.googleapis.com/css?family=Roboto:400,700,300);
 
         .btn {
@@ -43,26 +39,14 @@
             }
         }
     </style>
-    <!-- <script>
-        var elem = document.querySelector('.sidenav');
-        var instance = new M.Sidenav(elem);
-        $(function () {
-            $('.sidenav').sidenav();
-            // debugging && console.log($('.sidenav'))
-        });
-        $(document).ready(function () {
-            // $('select').formSelect();
-        });
-    </script> -->
 </head>
 
-<body>
+<body onload="App_onStartUp()">
     <!-- playing and training section -->
 
     <nav class="nav-wraper">
         <div class="container">
             <ul id="slide-out" class="sidenav">
-
                 <li><a href="/index.html">Home</a></li>
                 <li><a href="/Registeration.html">Registeration</a></li>
                 <li><a href="/Modifing.html">Modifing</a></li>
@@ -84,20 +68,19 @@
                 <li><a href="/Registed.html">Registed</a></li>
                 <li><a href="/New_session.html">New_session</a></li>
                 <li><a href="/Setting.html">Setting</a></li>
-
             </ul>
         </div>
     </nav>
 
 
-    <div class="container center-align" id="main_content">
+    <div class="container center-align" id="main_content" onload="Registeration_onLoad()">
         <br />
         <br />
         <br />
         <div class="row">
             <form action="">
                 <div class="row">
-                    <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                    <input id="cam" type="file" accept="image/*;capture=camera" >
                     <div class="btn-floating" onclick="$('#cam').click()"><i class="material-icons">camera_alt</i></div>
                 </div>
                 <div class="row">
@@ -117,7 +100,9 @@
                         <input value="" id="Location" type="text" class="validate">
                         <label class="active" for="Location">Location</label>
                     </div>
-                    <div class="btn-floating tooltipped" data-position="bottom" data-tooltip="fill with current location" onclick="fill_with_current_location()"><i class="material-icons">my_location</i></div>
+                    <div class="btn-floating tooltipped" data-position="bottom"
+                        data-tooltip="fill with current location" onclick="fill_with_current_location()"><i
+                            class="material-icons">my_location</i></div>
                 </div>
                 <div class="row">
                     <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
@@ -136,7 +121,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <button type="submit" class="btn" style="border-radius: 18px; " onclick="submit_registration()" >Submit</button>
+                    <button id="registeration_submit" type="submit" class="btn disabled" style="border-radius: 18px; "
+                        onclick="submit_registration()">Submit</button>
                 </div>
 
             </form>
@@ -144,43 +130,24 @@
     </div>
 
     <script>
-        var debugging=true;
-        let camera_button = document.querySelector("#start-camera");
-        let video = document.querySelector("#video");
-        let click_button = document.querySelector("#click-photo");
-        let canvas = document.querySelector("#canvas");
+        // let camera_button = document.querySelector("#start-camera");
+        // let video = document.querySelector("#video");
+        // let click_button = document.querySelector("#click-photo");
+        // let canvas = document.querySelector("#canvas");
 
-        camera_button.addEventListener('click', async function () {
-            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            video.srcObject = stream;
-        });
+        // camera_button.addEventListener('click', async function () {
+        //     let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        //     video.srcObject = stream;
+        // });
 
-        click_button.addEventListener('click', function () {
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            let image_data_url = canvas.toDataURL('image/jpeg');
+        // click_button.addEventListener('click', function () {
+        //     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        //     let image_data_url = canvas.toDataURL('image/jpeg');
 
-            // data url of the image
-            debugging && console.log(image_data_url);
-        });
-        var db;
-        var request = window.indexedDB.open("sefain_brain")
-        request.onupgradeneeded=(event)=>{
-            db=event.target.result;
-            let children=db.createObjectStore("children",{keyPath:"Name"});
-            //TODO : ask if have db.json to import or no
-            debugging && console.log("request.onupgradeneeded called");
-        }
-
-        request.onsuccess=(event)=>{
-            db=event.target.result;
-            debugging && console.log("request.onsuccess called");
-
-        }
-
-        request.onerror=(event)=>{
-            debugging && console.log("request.onerror called");
-            debugging && console.log(event.target.result);
-        }
+        //     // data url of the image
+        //     debugging && console.log(image_data_url);
+        // });
+        
 
 
     </script>
