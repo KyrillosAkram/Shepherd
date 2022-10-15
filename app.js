@@ -9,7 +9,7 @@ var pages = {
     New_session: { page_content: {} },
     Setting: { page_content: {} }
 }
-
+var registration_discriptor = [];
 function App_onStartUp() {
     // TODO : run loadup codevar db;
     let request = window.indexedDB.open("sefain_brain", 1);
@@ -27,7 +27,30 @@ function App_onStartUp() {
 
     };
     request.onerror = (event) => { alert("errooooooooooooooooooooor") }
-
+    switch ($("a.brand-logo").html()) {
+        case "index":
+           debugging&console.log("index"); 
+           break;
+        case "Registeration":
+           debugging&console.log("Registeration"); 
+           Registeration_onLoad();
+           break;
+        case "Modifing":
+           debugging&console.log("Modifing"); 
+           break;
+        case "Registed":
+           debugging&console.log("Registed"); 
+           break;
+        case "New_session":
+           debugging&console.log("New_session"); 
+           break;
+        case "Setting":
+           debugging&console.log("Setting"); 
+           break;
+        default:
+            debugging&console.log($("a.brand-logo").html());
+            break;
+    }
 }
 
 function swap_current_page_content(event) {
@@ -69,7 +92,7 @@ function x(e) {
 
 function submit_registration() {
     let check_counter = 5
-    (Boolean($("#cam").val())) ? check_counter-- : M.toast({ html: "please select/take image" });
+    Boolean($("#cam").val()) ? check_counter-- : M.toast({ html: "please select/take image" });
     (Boolean($("#Name").val())) ? check_counter-- : M.toast({ html: "please enter the name" });
     (Boolean($("#Address").val())) ? check_counter-- : M.toast({ html: "please enter the address" });
     (Boolean($("#Location").val())) ? check_counter-- : M.toast({ html: "please enter the location" });
@@ -78,17 +101,21 @@ function submit_registration() {
         if(Boolean(window.db))
         {
             try {
-                let trx=window.db.transaction("children","readWrite")
+                let trx=window.db.transaction("children","readwrite")
                 let children=trx.objectStore("children");
-                children.add(
-                    {
-                        Name        :$("#Name").val(),
-                        Address     :$("#Address").val(),
-                        Location    :$("#Location").val(),
-                        Class       :$("#Class").val(),
-                        Discriptor  :new faceapi.LabeledFaceDescriptors($("#Name").val(), registration_discriptor),
-                    }
-                )
+                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), registration_discriptor)]).then((values)=>{
+                    children.add(
+                        {
+                            Name        :$("#Name").val(),
+                            Address     :$("#Address").val(),
+                            Location    :$("#Location").val(),
+                            Class       :$("#Class").val(),
+                            Discriptor  :values[0],
+                        }
+                    )
+                    debugging&console.log("children.add");
+
+                })
                 registration_discriptor=null;
             } catch (error) {
                 debugging & console.log(error);
@@ -101,6 +128,7 @@ function submit_registration() {
 }
 
 function Registeration_onLoad() {
+    let image,canvas;
     debugging&console.log("Registeration_onLoad") 
     Promise.all([
         faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
@@ -109,13 +137,26 @@ function Registeration_onLoad() {
     ]).then(() => { // action event binder for registeration
         const cam = document.getElementById('cam');
         M.toast({ html: 'you can choose image' })
-        var registration_discriptor = null;
+        // var registration_discriptor = [];
         cam.addEventListener('change', async () => {
             //TODO : need async improvment
             debugging&console.log("cam change called")
-            registration_discriptor = await faceapi.detectSingleFace(cam).withFaceLandmarks().withFaceDescriptor().then(() => {
-                $("#registeration_submit").removeClass("disable");
-            })
+            container=document.getElementById("image_section")
+            if (image) image.remove()
+            if (canvas) canvas.remove()
+            image = await faceapi.bufferToImage(cam.files[0])
+            
+            container.append(image)
+            // canvas = faceapi.createCanvasFromMedia(image)
+            // container.append(canvas)
+            var det=await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().discriptor;
+            registration_discriptor.push(det);
+            debugging&console.log("remove disable");
+            $("#registeration_submit").removeClass("disabled")
+            /*.then((evnet)=>{
+                return event;
+            })*/
+
         })
     })
 }

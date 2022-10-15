@@ -80,7 +80,7 @@
         <div class="row">
             <form action="">
                 <div class="row">
-                    <input id="cam" type="file" accept="image/*;capture=camera" >
+                    <input id="cam" type="file" accept="image/*;capture=camera" class="hide" >
                     <div class="btn-floating" onclick="$('#cam').click()"><i class="material-icons">camera_alt</i></div>
                 </div>
                 <div class="row">
@@ -121,8 +121,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <button id="registeration_submit" type="submit" class="btn disabled" style="border-radius: 18px; "
+                    <button id="registeration_submit"  class="btn disabled" style="border-radius: 18px; "
                         onclick="submit_registration()">Submit</button>
+                </div>
+                <div class="row" id="image_section">
+
                 </div>
 
             </form>
