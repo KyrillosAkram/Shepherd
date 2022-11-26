@@ -103,7 +103,7 @@ function submit_registration() {
             try {
                 let trx=window.db.transaction("children","readwrite")
                 let children=trx.objectStore("children");
-                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), registration_discriptor)]).then((values)=>{
+                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), [window.registration_discriptor.descriptor])]).then((values)=>{
                     children.add(
                         {
                             Name        :$("#Name").val(),
@@ -111,12 +111,13 @@ function submit_registration() {
                             Location    :$("#Location").val(),
                             Class       :$("#Class").val(),
                             Discriptor  :values[0],
+                            // Discriptor  :window.registration_discriptor,
                         }
                     )
                     debugging&console.log("children.add");
 
                 })
-                registration_discriptor=null;
+                window.registration_discriptor=null;
             } catch (error) {
                 debugging & console.log(error);
                 M.toast({html:error})
@@ -149,10 +150,14 @@ function Registeration_onLoad() {
             container.append(image)
             // canvas = faceapi.createCanvasFromMedia(image)
             // container.append(canvas)
-            var det=await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().discriptor;
-            registration_discriptor.push(det);
-            debugging&console.log("remove disable");
-            $("#registeration_submit").removeClass("disabled")
+            // var det=await ;
+            // registration_discriptor.push(await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().discriptor);
+            faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then((event)=>{
+                console.log(event)
+                window.registration_discriptor= {...event}
+                debugging&console.log("remove disable");
+                $("#registeration_submit").removeClass("disabled")
+            })
             /*.then((evnet)=>{
                 return event;
             })*/
@@ -168,6 +173,25 @@ if ('serviceWorker' in navigator) {
         .catch((error_obj) => console.log("sw not registed ", error_obj))
 }
 
+/*********************************** Session ***********************************/
+
+function Session_Actions_Save(){
+
+}
+
+function Session_Actions_Load(){
+
+}
+
+function Session_Actions_Import(){
+
+}
+
+function Session_Actions_Export(){
+
+}
+
+/********************************************************************************/
 primer_color_theme = "indigo"
 $(".btn,.btn-floating").addClass("waves-effect waves-light " + primer_color_theme)
 $("nav").addClass(primer_color_theme)

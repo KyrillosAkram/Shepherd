@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="indigo">
+    <!--Import Google Icon Font             -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS          -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript   -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <title>Document</title>
+    <style>
+        .row .col {
+            /* //padding: 1px !important; */
+            margin: 2% !important;
+        }
+        /* .session_option{
+            a: ;
+        } */
+        .btn {
+            /* border-radius: 0; */
+            /* padding: 2px ; */
+        }
+
+        header,
+        main,
+        footer {
+            padding-left: 300px;
+        }
+
+        @media only screen and (max-width : 992px) {
+
+            header,
+            main,
+            footer {
+                padding-left: 0;
+            }
+        }
+
+        /* .container{
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        } */
+    </style>
+</head>
+
+<body
+    disabled_onkeyup="'0123456789-+.*/()'.includes( event.key) ?display_append(event.key):'Backspace'.includes(event.key)?$('#Backspace').click():'Enter'.includes(event.key)?calculate():console.log('not supported key')"
+    >
+    <!-- playing and training section -->
+ 
+        <nav class="nav-wraper">
+            <div class="container">
+                <ul id="slide-out" class="sidenav">
+
+                    <li><a href="/index.html">Home</a></li>
+                    <li><a href="/Registeration.html">Registeration</a></li>
+                    <li><a href="/Modifing.html">Modifing</a></li>
+                    <li><a href="/Registed.html">Registed</a></li>
+                    <li><a href="/Session.html">Session</a></li>
+                    <li><a href="/Setting.html">Setting</a></li>
+                    <li>
+                        <div class="divider"></div>
+                    </li>
+                    <li><a class="subheader">Subheader</a></li>
+                    <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
+                </ul>
+                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <a href="#" class="brand-logo">Session</a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="/index.html">Home</a></li>
+                    <li><a href="/Registeration.html">Registeration</a></li>
+                    <li><a href="/Modifing.html">Modifing</a></li>
+                    <li><a href="/Registed.html">Registed</a></li>
+                    <li><a href="/Session.html">Session</a></li>
+                    <li><a href="/Setting.html">Setting</a></li>
+                </ul>
+            </div>
+        </nav>
+
+
+    <div class="container" id="main_content">
+        <br />
+        <div class="row">
+            <div class="">
+                <!-- Dropdown Trigger -->
+                <a class='dropdown-trigger btn col s12' href='#' data-target='dropdown1'>Actions<i class="material-icons right">expand_more</i></a>
+            
+                <!-- Dropdown Structure -->
+                <ul id='dropdown1' class='dropdown-content'>
+                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Save()">save</i>Save</a></li>
+                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Load()">settings_backup_restore</i>Load</a></li>
+                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Import()">upload</i>Import</a></li>
+                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Import()">download</i>Export</a></li>
+                    <li><a href="#!" class="red white-text"><i class="material-icons red" onclick="Session_Actions_Export()">close</i>Close this menu</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>
