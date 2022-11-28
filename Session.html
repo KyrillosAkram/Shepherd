@@ -20,6 +20,7 @@
             /* //padding: 1px !important; */
             margin: 2% !important;
         }
+
         /* .session_option{
             a: ;
         } */
@@ -53,55 +54,175 @@
 
 <body
     disabled_onkeyup="'0123456789-+.*/()'.includes( event.key) ?display_append(event.key):'Backspace'.includes(event.key)?$('#Backspace').click():'Enter'.includes(event.key)?calculate():console.log('not supported key')"
-    >
+    onload="App_onStartUp()">
     <!-- playing and training section -->
- 
-        <nav class="nav-wraper">
-            <div class="container">
-                <ul id="slide-out" class="sidenav">
 
-                    <li><a href="/index.html">Home</a></li>
-                    <li><a href="/Registeration.html">Registeration</a></li>
-                    <li><a href="/Modifing.html">Modifing</a></li>
-                    <li><a href="/Registed.html">Registed</a></li>
-                    <li><a href="/Session.html">Session</a></li>
-                    <li><a href="/Setting.html">Setting</a></li>
-                    <li>
-                        <div class="divider"></div>
-                    </li>
-                    <li><a class="subheader">Subheader</a></li>
-                    <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
-                </ul>
-                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <a href="#" class="brand-logo">Session</a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="/index.html">Home</a></li>
-                    <li><a href="/Registeration.html">Registeration</a></li>
-                    <li><a href="/Modifing.html">Modifing</a></li>
-                    <li><a href="/Registed.html">Registed</a></li>
-                    <li><a href="/Session.html">Session</a></li>
-                    <li><a href="/Setting.html">Setting</a></li>
-                </ul>
-            </div>
-        </nav>
+    <nav class="nav-wraper">
+        <div class="container">
+            <ul id="slide-out" class="sidenav">
+
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/Registeration.html">Registeration</a></li>
+                <li><a href="/Modifing.html">Modifing</a></li>
+                <li><a href="/Registed.html">Registed</a></li>
+                <li><a href="/Session.html">Session</a></li>
+                <li><a href="/Setting.html">Setting</a></li>
+                <li>
+                    <div class="divider"></div>
+                </li>
+                <li><a class="subheader">Subheader</a></li>
+                <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
+            </ul>
+            <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <a href="#" class="brand-logo">Session</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/Registeration.html">Registeration</a></li>
+                <li><a href="/Modifing.html">Modifing</a></li>
+                <li><a href="/Registed.html">Registed</a></li>
+                <li><a href="/Session.html">Session</a></li>
+                <li><a href="/Setting.html">Setting</a></li>
+            </ul>
+        </div>
+    </nav>
 
 
-    <div class="container" id="main_content">
-        <br />
+    <br />
+    <div class="container right-align">
+        <!-- <div class=" container right-align"> -->
+
+        <!-- Dropdown Trigger -->
+        <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'><i
+                class="material-icons right">more_horiz</i></a>
+
+        <!-- Dropdown Structure -->
+        <ul id='dropdown1' class='dropdown-content'>
+            <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_Save()">save</i>Save</a></li>
+            <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_Load()">settings_backup_restore</i>Load</a></li>
+            <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_Import()">upload</i>Import</a></li>
+            <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_Import()">download</i>Export</a></li>
+            <li><a href="#!" class="red white-text"><i class="material-icons red"
+                        onclick="Session_Actions_Export()">close</i>Close</a></li>
+        </ul>
+        <!-- </div> -->
+    </div>
+    <div class="container center-align" id="main_content">
+
         <div class="row">
-            <div class="">
-                <!-- Dropdown Trigger -->
-                <a class='dropdown-trigger btn col s12' href='#' data-target='dropdown1'>Actions<i class="material-icons right">expand_more</i></a>
-            
-                <!-- Dropdown Structure -->
-                <ul id='dropdown1' class='dropdown-content'>
-                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Save()">save</i>Save</a></li>
-                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Load()">settings_backup_restore</i>Load</a></li>
-                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Import()">upload</i>Import</a></li>
-                    <li><a href="#!" class="indigo-text"><i class="material-icons " onclick="Session_Actions_Import()">download</i>Export</a></li>
-                    <li><a href="#!" class="red white-text"><i class="material-icons red" onclick="Session_Actions_Export()">close</i>Close this menu</a></li>
-                </ul>
-            </div>
+
+            <ul class="collapsible">
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">church</i>Going to church</div>
+                    <div class="collapsible-body container">
+                        <div class="row container right-align">
+                            <div class="btn-floating disabled" onclick=""><i class="material-icons">delete</i></div>
+                            <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                            <div class="btn-floating" onclick="$('#cam').click()">
+                                <i class="material-icons">add_a_photo</i>
+                            </div>
+                                    
+                            <!-- Modal Trigger -->
+                            <div class="btn-floating modal-trigger" data-target="all_registed_children" onclick=""><i class="material-icons">add</i></div>
+
+                        </div>
+                        <!-- Modal Structure -->
+                        <div id="all_registed_children" class="modal ">
+                            <div class="modal-content left-align">
+                            <h4>Manual adding</h4>
+                            <p>A bunch of text</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="modal-close indigo white-text waves-effect waves-green btn-flat">Add</button>
+                                <button class="modal-close red white-text waves-effect waves-green btn-flat ">Cancel</button>
+                            </div>
+                        </div>
+                        <div class="row left-align">
+
+
+                            <table class="striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Class</th>
+                                        <th>Address</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="church_table">
+                                    <tr>
+                                        <td>Alvin</td>
+                                        <td>Eclair</td>
+                                        <td>$0.87</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alan</td>
+                                        <td>Jellybean</td>
+                                        <td>$3.76</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ميخا</td>
+                                        <td>Lollipop</td>
+                                        <td>$7.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">home</i>Returning to home</div>
+                    <div class="collapsible-body">
+                        <div class="row container right-align">
+                            <div class="btn-floating disabled" onclick=""><i class="material-icons">delete</i></div>
+                            <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                            <div class="btn-floating" onclick="$('#cam').click()"><i
+                                    class="material-icons">add_a_photo</i></div>
+                            <div class="btn-floating" onclick=""><i class="material-icons">add</i></div>
+                        <div class="row left-align">
+
+
+                            <table class="striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Class</th>
+                                        <th>Address</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="home_table">
+                                    <tr ondblclick="console.log(this);drow=this">
+                                        <td>Alvin</td>
+                                        <td>Eclair</td>
+                                        <td>$0.87</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alan</td>
+                                        <td>Jellybean</td>
+                                        <td>$3.76</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ميخا</td>
+                                        <td>Lollipop</td>
+                                        <td>$7.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">person_search</i>Search for missing</div>
+                    <div class="collapsible-body"><span>To be implemented</span></div>
+                </li>
+            </ul>
+
         </div>
     </div>
 

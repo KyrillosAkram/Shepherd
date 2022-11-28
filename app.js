@@ -191,10 +191,21 @@ function Session_Actions_Export(){
 
 }
 
+function Session_cherch_table_manual_add(){
+
+}
 /********************************************************************************/
 primer_color_theme = "indigo"
 $(".btn,.btn-floating").addClass("waves-effect waves-light " + primer_color_theme)
 $("nav").addClass(primer_color_theme)
+
+document.addEventListener('DOMContentLoaded', function() {
+    var Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'), options);
+    var Modal_instances = M.Modal.init(document.querySelectorAll('.modal'), options);
+
+
+    
+});
 
 
 var elem = document.querySelector('.sidenav');

@@ -51,7 +51,9 @@
                 <li><a href="/Registeration.html">Registeration</a></li>
                 <li><a href="/Modifing.html">Modifing</a></li>
                 <li><a href="/Registed.html">Registed</a></li>
-                <li><a href="/New_session.html">New_session</a></li>
+
+                <li><a href="/Session.html">Session</a></li>
+
                 <li><a href="/Setting.html">Setting</a></li>
                 <li>
                     <div class="divider"></div>
@@ -66,7 +68,9 @@
                 <li><a href="/Registeration.html">Registeration</a></li>
                 <li><a href="/Modifing.html">Modifing</a></li>
                 <li><a href="/Registed.html">Registed</a></li>
-                <li><a href="/New_session.html">New_session</a></li>
+
+                <li><a href="/Session.html">Session</a></li>
+
                 <li><a href="/Setting.html">Setting</a></li>
             </ul>
         </div>
@@ -78,54 +82,53 @@
         <br />
         <br />
         <div class="row">
-                <div class="row">
-                    <input id="cam" type="file" accept="image/*;capture=camera" class="hide" >
-                    <div class="btn-floating" onclick="$('#cam').click()"><i class="material-icons">camera_alt</i></div>
+            <div class="row">
+                <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                <div class="btn-floating" onclick="$('#cam').click()"><i class="material-icons">camera_alt</i></div>
+            </div>
+            <div class="row">
+                <div class="input-field">
+                    <input value="" id="Name" type="text" class="validate">
+                    <label class="active" for="Name">Name</label>
                 </div>
-                <div class="row">
-                    <div class="input-field">
-                        <input value="" id="Name" type="text" class="validate">
-                        <label class="active" for="Name">Name</label>
-                    </div>
+            </div>
+            <div class="row">
+                <div class="input-field">
+                    <input value="" id="Address" type="text" class="validate">
+                    <label class="active" for="Address">Address</label>
                 </div>
-                <div class="row">
-                    <div class="input-field">
-                        <input value="" id="Address" type="text" class="validate">
-                        <label class="active" for="Address">Address</label>
-                    </div>
+            </div>
+            <div class="row">
+                <div class="input-field">
+                    <input value="" id="Location" type="text" class="validate">
+                    <label class="active" for="Location">Location</label>
                 </div>
-                <div class="row">
-                    <div class="input-field">
-                        <input value="" id="Location" type="text" class="validate">
-                        <label class="active" for="Location">Location</label>
-                    </div>
-                    <div class="btn-floating tooltipped" data-position="bottom"
-                        data-tooltip="fill with current location" onclick="fill_with_current_location()"><i
-                            class="material-icons">my_location</i></div>
+                <div class="btn-floating tooltipped" data-position="bottom" data-tooltip="fill with current location"
+                    onclick="fill_with_current_location()"><i class="material-icons">my_location</i></div>
+            </div>
+            <div class="row">
+                <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
+                <div class="input-field">
+                    <select id="Class">
+                        <option value="?" disabled selected>Choose your option</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                    <label for="Class">Class</label>
                 </div>
-                <div class="row">
-                    <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
-                    <div class="input-field">
-                        <select id="Class">
-                            <option value="?" disabled selected>Choose your option</option>
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                        </select>
-                        <label for="Class">Class</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <button id="registeration_submit"  class="btn disabled" style="border-radius: 18px; "
-                        onclick="submit_registration()">Submit</button>
-                </div>
-                <div class="row" id="image_section">
+            </div>
+            <div class="row">
+                <button id="registeration_submit" class="btn disabled" style="border-radius: 18px; "
+                    onclick="submit_registration()">Submit</button>
+            </div>
+            <div class="row" id="image_section">
 
-                </div>
+            </div>
 
         </div>
     </div>
@@ -148,7 +151,7 @@
         //     // data url of the image
         //     debugging && console.log(image_data_url);
         // });
-        
+
 
 
     </script>
