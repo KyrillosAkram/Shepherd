@@ -126,17 +126,30 @@
                             </div>
                                     
                             <!-- Modal Trigger -->
-                            <div class="btn-floating modal-trigger" data-target="all_registed_children" onclick=""><i class="material-icons">add</i></div>
+                            <div id="add_to_church_table" class="btn-floating modal-trigger" data-target="all_registed_children" onclick="Session_cherch_table_manual_add(this)"><i class="material-icons">add</i></div>
 
                         </div>
                         <!-- Modal Structure -->
                         <div id="all_registed_children" class="modal ">
                             <div class="modal-content left-align">
-                            <h4>Manual adding</h4>
-                            <p>A bunch of text</p>
+                                <h4>Manual adding</h4>
+                            
+                                <div class="row">
+                                    <div class="col s12">
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <i class="material-icons prefix">search</i>
+                                                <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete">
+                                                <label for="autocomplete-input">Search for name</label>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            
                             </div>
                             <div class="modal-footer">
-                                <button class="modal-close indigo white-text waves-effect waves-green btn-flat">Add</button>
+                                <button class="modal-close indigo white-text waves-effect waves-green btn-flat" onclick="Session_table_manual_add_btn()">Add</button>
                                 <button class="modal-close red white-text waves-effect waves-green btn-flat ">Cancel</button>
                             </div>
                         </div>

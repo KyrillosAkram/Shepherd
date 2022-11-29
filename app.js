@@ -23,34 +23,55 @@ function App_onStartUp() {
     request.onsuccess = (event) => {
         var db = event.target.result;
         window.db = db;
+        refresh_all_registed_childrens()
         debugging & console.log("successful");
-
     };
     request.onerror = (event) => { alert("errooooooooooooooooooooor") }
     switch ($("a.brand-logo").html()) {
         case "index":
-           debugging&console.log("index"); 
-           break;
+            debugging & console.log("index");
+            break;
         case "Registeration":
-           debugging&console.log("Registeration"); 
-           Registeration_onLoad();
-           break;
+            debugging & console.log("Registeration");
+            Registeration_onLoad();
+            break;
         case "Modifing":
-           debugging&console.log("Modifing"); 
-           break;
+            debugging & console.log("Modifing");
+            break;
         case "Registed":
-           debugging&console.log("Registed"); 
-           break;
-        case "New_session":
-           debugging&console.log("New_session"); 
-           break;
+            debugging & console.log("Registed");
+            break;
+        case "Session":
+            debugging & console.log("Session");
+            // Window.all_registed_childrens=null
+            setInterval(() => {
+
+            },)
+            break;
         case "Setting":
-           debugging&console.log("Setting"); 
-           break;
+            debugging & console.log("Setting");
+            break;
         default:
-            debugging&console.log($("a.brand-logo").html());
+            debugging & console.log($("a.brand-logo").html());
             break;
     }
+}
+function refresh_all_registed_childrens() {
+    let myreq = window.db.transaction(["children"], "readwrite").objectStore("children").getAll()
+    myreq.onerror = (event) => M.toast({ html: event });
+
+    myreq.onsuccess = () => {
+        Window.all_registed_childrens = myreq.result
+        let obj={}
+        for(record of Window.all_registed_childrens){
+            eval(`obj={...obj,"${record.Name}":null}`)
+        }
+        console.log(obj)
+        console.log(Window.autoComplete_instances)
+        for (o of document.querySelectorAll('.autocomplete')){M.Autocomplete.getInstance(o).updateData(obj)}
+    }
+
+    debugging & console.log("refresh_all_registed_childrens");
 }
 
 function swap_current_page_content(event) {
@@ -98,39 +119,38 @@ function submit_registration() {
     (Boolean($("#Location").val())) ? check_counter-- : M.toast({ html: "please enter the location" });
     (Boolean($("#Class").val())) ? check_counter-- : M.toast({ html: "please choose class" });
     if (!check_counter) {// if all checks are ok
-        if(Boolean(window.db))
-        {
+        if (Boolean(window.db)) {
             try {
-                let trx=window.db.transaction("children","readwrite")
-                let children=trx.objectStore("children");
-                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), [window.registration_discriptor.descriptor])]).then((values)=>{
+                let trx = window.db.transaction("children", "readwrite")
+                let children = trx.objectStore("children");
+                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), [window.registration_discriptor.descriptor])]).then((values) => {
                     children.add(
                         {
-                            Name        :$("#Name").val(),
-                            Address     :$("#Address").val(),
-                            Location    :$("#Location").val(),
-                            Class       :$("#Class").val(),
-                            Discriptor  :values[0],
+                            Name: $("#Name").val(),
+                            Address: $("#Address").val(),
+                            Location: $("#Location").val(),
+                            Class: $("#Class").val(),
+                            Discriptor: values[0],
                             // Discriptor  :window.registration_discriptor,
                         }
                     )
-                    debugging&console.log("children.add");
+                    debugging & console.log("children.add");
 
                 })
-                window.registration_discriptor=null;
+                window.registration_discriptor = null;
             } catch (error) {
                 debugging & console.log(error);
-                M.toast({html:error})
+                M.toast({ html: error })
             }
         }
     } else {
-        M.toast({html:"Please fill all filds !!!"})
+        M.toast({ html: "Please fill all filds !!!" })
     }
 }
 
 function Registeration_onLoad() {
-    let image,canvas;
-    debugging&console.log("Registeration_onLoad") 
+    let image, canvas;
+    debugging & console.log("Registeration_onLoad")
     Promise.all([
         faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
@@ -141,21 +161,21 @@ function Registeration_onLoad() {
         // var registration_discriptor = [];
         cam.addEventListener('change', async () => {
             //TODO : need async improvment
-            debugging&console.log("cam change called")
-            container=document.getElementById("image_section")
+            debugging & console.log("cam change called")
+            container = document.getElementById("image_section")
             if (image) image.remove()
             if (canvas) canvas.remove()
             image = await faceapi.bufferToImage(cam.files[0])
-            
+
             container.append(image)
             // canvas = faceapi.createCanvasFromMedia(image)
             // container.append(canvas)
             // var det=await ;
             // registration_discriptor.push(await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().discriptor);
-            faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then((event)=>{
+            faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then((event) => {
                 console.log(event)
-                window.registration_discriptor= {...event}
-                debugging&console.log("remove disable");
+                window.registration_discriptor = { ...event }
+                debugging & console.log("remove disable");
                 $("#registeration_submit").removeClass("disabled")
             })
             /*.then((evnet)=>{
@@ -174,41 +194,94 @@ if ('serviceWorker' in navigator) {
 }
 
 /*********************************** Session ***********************************/
+// TODO: 
 
-function Session_Actions_Save(){
-
-}
-
-function Session_Actions_Load(){
+function Session_Actions_Save() {
 
 }
 
-function Session_Actions_Import(){
+function Session_Actions_Load() {
 
 }
 
-function Session_Actions_Export(){
+function Session_Actions_Import() {
 
 }
 
-function Session_cherch_table_manual_add(){
+function Session_Actions_Export() {
 
+}
+
+function Session_cherch_table_manual_add(element) {
+    Window.Session_children_add=element.id
+}
+
+function Session_generat_table_row(child_record){
+    let tr=document.createElement("tr")
+    tr.setAttribute('class','child_row')
+    let td_n=document.createElement("td")
+    td_n.setAttribute('class','child_name' )
+    td_n.append(document.createTextNode(child_record.Name ))
+    tr.appendChild(td_n)
+    let td_c=document.createElement("td")
+    td_c.setAttribute('class','child_class' )
+    td_c.append(document.createTextNode(child_record.Class ))
+    tr.appendChild(td_c)
+     td_c=document.createElement("td")
+    td_c.setAttribute('class','child_Address' )
+    td_c.append(document.createTextNode(child_record.Address ))
+    tr.appendChild(td_c)
+    // tr.appendChild(document.createElement("td").setAttribute('class','child_class').append(document.createTextNode(child_record.Class)))
+    
+    return tr
+}
+
+function Session_table_manual_add_btn(){
+    let tbody=null
+    switch(Window.Session_children_add)
+    {
+        case "add_to_church_table":
+            tbody=document.getElementById("church_table")
+            break
+        case "add_to_home_table":
+            tbody=document.getElementById("home_table")
+            break
+        default:
+            return
+            break
+    }
+    console.log(tbody)
+    let request= window.db.transaction(["children"],"readwrite").objectStore("children").get(document.querySelector("#autocomplete-input-search-manual-add").value)
+    request.onsuccess=()=>{
+        tbody.appendChild(Session_generat_table_row(request.result))
+    }
 }
 /********************************************************************************/
+
+
+/************************************ db routins ********************************************/
+// function get_child_recored(child_name)
+// {
+//     request.onsuccess=()=>{
+//         return request.result
+//     }
+// }
+/********************************************************************************/
+
+/*********************************** Javascript style modifiers ***********************************/
 primer_color_theme = "indigo"
 $(".btn,.btn-floating").addClass("waves-effect waves-light " + primer_color_theme)
 $("nav").addClass(primer_color_theme)
 
-document.addEventListener('DOMContentLoaded', function() {
-    var Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'), options);
-    var Modal_instances = M.Modal.init(document.querySelectorAll('.modal'), options);
+/********************************************************************************/
 
+/*********************************** Materialize javascript initializers ***********************************/
 
-    
-});
-
-
-var elem = document.querySelector('.sidenav');
-var instance = new M.Sidenav(elem);
+Window.Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'));
+Window.Modal_instances = M.Modal.init(document.querySelectorAll('.modal'));
+Window.autoComplete_instances = M.Autocomplete.init(document.querySelectorAll('.autocomplete',{data:{}}));
+Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
 
 M.AutoInit();
+
+/********************************************************************************/
