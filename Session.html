@@ -86,17 +86,66 @@
         </div>
     </nav>
 
+<br />
 
-    <br />
-    <div class="container right-align">
-        <!-- <div class=" container right-align"> -->
+<!-- <div class="fixed-action-btn click-to-toggle">
+    <a class="btn-floating btn">
+        <i class="large material-icons">mode_edit</i>
+    </a>
+    <ul>
+        <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+        <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+        <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+        <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+    </ul>
+</div> -->
 
+<div class="container right-align">
+    <!-- <div class=" container right-align"> -->
+
+        <!-- </div> -->
+        <div class="red btn-floating session_table_action_btn disabled table_body_row_action" onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled')"><i class="material-icons">group_remove</i></div>
+        <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+        <div class="btn-floating session_table_action_btn disabled" onclick="$('#cam').click()">
+            <i class="material-icons">add_a_photo</i>
+        </div>
+        <!-- Modal Trigger -->
+        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled" data-target="all_registed_children" onclick="Session_cherch_table_manual_add(this)"><i class="material-icons">group_add</i></div>
+        
+        <!-- Modal Structure -->
+        <div id="all_registed_children" class="modal ">
+            <div class="modal-content left-align">
+                <h4>Adding</h4>
+                
+                <div class="row">
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="input-field col s10" onfocusout="setTimeout(()=>{document.querySelector('#search_clear').classList.add('hide');console.log('focusout')},200)" oninput="document.querySelector('#search_clear').classList.remove('hide');console.log('focus')">
+                                <i class="material-icons prefix">search</i>
+                                <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete" >
+                                <label for="autocomplete-input">Search for name</label>
+                            </div>
+                            <button id="search_clear" class="btn-flat waves-effect waves-red col s1 hide" style="border-radius: 50%;height: width;" onclick="document.querySelector('#autocomplete-input-search-manual-add').value='';console.log('search_clear')">
+                                <i class="material-icons">close</i>
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button class="indigo white-text waves-effect waves-green btn-flat" onclick="Session_table_manual_add_btn()">Add</button>
+                <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
+            </div>
+        </div>
         <!-- Dropdown Trigger -->
-        <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'><i
-                class="material-icons right">more_horiz</i></a>
+        <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'>
+            <i class="material-icons right">more_horiz</i>
+        </a>
 
         <!-- Dropdown Structure -->
-        <ul id='dropdown1' class='dropdown-content'>
+        <ul id='dropdown1' class='dropdown-content' style="width:auto;">
             <li><a href="#!" class="indigo-text"><i class="material-icons "
                         onclick="Session_Actions_Save()">save</i>Save</a></li>
             <li><a href="#!" class="indigo-text"><i class="material-icons "
@@ -108,50 +157,17 @@
             <li><a href="#!" class="red white-text"><i class="material-icons red"
                         onclick="Session_Actions_Export()">close</i>Close</a></li>
         </ul>
-        <!-- </div> -->
+        
     </div>
     <div class="container center-align" id="main_content">
 
         <div class="row">
 
-            <ul class="collapsible">
-                <li>
+            <ul class="collapsible" onclick="Session_table_add_btns_state_updater(this)">
+                <li id="li_church" class="collapsible_li_table">
                     <div class="collapsible-header"><i class="material-icons">church</i>Going to church</div>
                     <div class="collapsible-body container">
                         <div class="row container right-align">
-                            <div class="btn-floating disabled" onclick=""><i class="material-icons">delete</i></div>
-                            <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
-                            <div class="btn-floating" onclick="$('#cam').click()">
-                                <i class="material-icons">add_a_photo</i>
-                            </div>
-                                    
-                            <!-- Modal Trigger -->
-                            <div id="add_to_church_table" class="btn-floating modal-trigger" data-target="all_registed_children" onclick="Session_cherch_table_manual_add(this)"><i class="material-icons">add</i></div>
-
-                        </div>
-                        <!-- Modal Structure -->
-                        <div id="all_registed_children" class="modal ">
-                            <div class="modal-content left-align">
-                                <h4>Manual adding</h4>
-                            
-                                <div class="row">
-                                    <div class="col s12">
-                                        <div class="row">
-                                            <div class="input-field col s12">
-                                                <i class="material-icons prefix">search</i>
-                                                <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete">
-                                                <label for="autocomplete-input">Search for name</label>
-                                            </div>
-                                        </div>
-                                        
-                                    </div>
-                                </div>
-                            
-                            </div>
-                            <div class="modal-footer">
-                                <button class="modal-close indigo white-text waves-effect waves-green btn-flat" onclick="Session_table_manual_add_btn()">Add</button>
-                                <button class="modal-close red white-text waves-effect waves-green btn-flat ">Cancel</button>
-                            </div>
                         </div>
                         <div class="row left-align">
 
@@ -166,35 +182,15 @@
                                 </thead>
 
                                 <tbody id="church_table">
-                                    <tr>
-                                        <td>Alvin</td>
-                                        <td>Eclair</td>
-                                        <td>$0.87</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Alan</td>
-                                        <td>Jellybean</td>
-                                        <td>$3.76</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ميخا</td>
-                                        <td>Lollipop</td>
-                                        <td>$7.00</td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </li>
-                <li>
+                <li id="li_home" class="collapsible_li_table">
                     <div class="collapsible-header"><i class="material-icons">home</i>Returning to home</div>
                     <div class="collapsible-body">
                         <div class="row container right-align">
-                            <div class="btn-floating disabled" onclick=""><i class="material-icons">delete</i></div>
-                            <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
-                            <div class="btn-floating" onclick="$('#cam').click()"><i
-                                    class="material-icons">add_a_photo</i></div>
-                            <div class="btn-floating" onclick=""><i class="material-icons">add</i></div>
                         <div class="row left-align">
 
 
@@ -208,21 +204,7 @@
                                 </thead>
 
                                 <tbody id="home_table">
-                                    <tr ondblclick="console.log(this);drow=this">
-                                        <td>Alvin</td>
-                                        <td>Eclair</td>
-                                        <td>$0.87</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Alan</td>
-                                        <td>Jellybean</td>
-                                        <td>$3.76</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ميخا</td>
-                                        <td>Lollipop</td>
-                                        <td>$7.00</td>
-                                    </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>

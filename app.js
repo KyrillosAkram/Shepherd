@@ -196,29 +196,85 @@ if ('serviceWorker' in navigator) {
 /*********************************** Session ***********************************/
 // TODO: 
 
-function Session_Actions_Save() {
+function Session_Actions_Save()
+{
 
 }
 
-function Session_Actions_Load() {
+function Session_Actions_Load()
+{
 
 }
 
-function Session_Actions_Import() {
+function Session_Actions_Import()
+{
 
 }
 
-function Session_Actions_Export() {
+function Session_Actions_Export()
+{
 
 }
 
-function Session_cherch_table_manual_add(element) {
+function Session_cherch_table_manual_add(element)
+{
     Window.Session_children_add=element.id
 }
 
-function Session_generat_table_row(child_record){
+function Session_table_add_btns_state_updater(element)
+{
+    setTimeout(()=>{
+    let session_table_action_btns=[...document.querySelectorAll(".session_table_action_btn")];
+    if([...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active")].length > 0)
+    {
+        session_table_action_btns.map(btn => {
+            if(btn.classList.contains('red') )
+            {
+                if(Boolean(Window.session_row_selection))btn.classList.remove('disabled');
+            }
+            else
+            {
+                btn.classList.remove('disabled')
+            }
+        })
+    }
+    else
+    {
+        session_table_action_btns.map(btn => btn.classList.add('disabled'))
+    }
+},200)
+}
+
+function Session_row_selection_toggle(element)
+{
+    if (!Boolean( Window.session_row_selection))
+    {
+        Window.session_row_selection=0;
+        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'))
+    }
+    element.classList.toggle('grey')
+    if(element.classList.contains('grey'))
+    {
+        Window.session_row_selection++
+        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.remove('disabled'))
+    }
+    else if(Window.session_row_selection > 0)
+    {
+        Window.session_row_selection--
+        if(Window.session_row_selection === 0)
+        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'));
+    }
+    else
+    {
+        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'))
+    }
+}
+
+function Session_generat_table_row(child_record)
+{
     let tr=document.createElement("tr")
     tr.setAttribute('class','child_row')
+    tr.setAttribute('onclick','Session_row_selection_toggle(this)')
     let td_n=document.createElement("td")
     td_n.setAttribute('class','child_name' )
     td_n.append(document.createTextNode(child_record.Name ))
@@ -236,7 +292,8 @@ function Session_generat_table_row(child_record){
     return tr
 }
 
-function Session_table_manual_add_btn(){
+function Session_table_manual_add_btn()
+{
     let tbody=null
     switch(Window.Session_children_add)
     {
@@ -280,6 +337,10 @@ $("nav").addClass(primer_color_theme)
 Window.Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'));
 Window.Modal_instances = M.Modal.init(document.querySelectorAll('.modal'));
 Window.autoComplete_instances = M.Autocomplete.init(document.querySelectorAll('.autocomplete',{data:{}}));
+Window.FAB_instances=M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'),{
+    direction: 'up',
+    hoverEnabled: false
+  } );
 Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
 
 M.AutoInit();
