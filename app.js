@@ -216,17 +216,19 @@ function Session_Actions_Export()
 
 }
 
-function Session_cherch_table_manual_add(element)
-{
-    Window.Session_children_add=element.id
-}
+// function Session_cherch_table_manual_add(element)
+// {
+//     Window.Session_children_add=element.id
+// }
 
 function Session_table_add_btns_state_updater(element)
 {
     setTimeout(()=>{
     let session_table_action_btns=[...document.querySelectorAll(".session_table_action_btn")];
-    if([...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active")].length > 0)
+    let active_tables=[...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active")]
+    if(active_tables.length > 0)
     {
+        Window.Session_children_add=active_tables[0].id;
         session_table_action_btns.map(btn => {
             if(btn.classList.contains('red') )
             {
@@ -269,12 +271,24 @@ function Session_row_selection_toggle(element)
         [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'))
     }
 }
+function Session_tbody_to_array(tbody)
+{
+    let arr=[];
+    [...tbody.querySelectorAll("td.child_name")].map(td => arr.push(td.textContent))
+    return arr;
+}
+
+function Session_get_missing(big_array,small_array)
+{
+    return big_array.filter(child => !small_array.includes(child))
+}
 
 function Session_generat_table_row(child_record)
 {
     let tr=document.createElement("tr")
     tr.setAttribute('class','child_row')
     tr.setAttribute('onclick','Session_row_selection_toggle(this)')
+    tr.setAttribute('ondblclick','console.log("dblclick action tobe implemented")')
     let td_n=document.createElement("td")
     td_n.setAttribute('class','child_name' )
     td_n.append(document.createTextNode(child_record.Name ))
@@ -283,7 +297,7 @@ function Session_generat_table_row(child_record)
     td_c.setAttribute('class','child_class' )
     td_c.append(document.createTextNode(child_record.Class ))
     tr.appendChild(td_c)
-     td_c=document.createElement("td")
+    td_c=document.createElement("td")
     td_c.setAttribute('class','child_Address' )
     td_c.append(document.createTextNode(child_record.Address ))
     tr.appendChild(td_c)
@@ -292,15 +306,54 @@ function Session_generat_table_row(child_record)
     return tr
 }
 
+function Session_missing_table_update()
+{
+    let big_arr= Session_tbody_to_array(document.querySelector("#church_table"))
+    let small_arr= Session_tbody_to_array(document.querySelector("#home_table"))
+    Session_missing_table_update_callback(Session_get_children(Session_get_missing(big_arr,small_arr),Session_missing_table_update_callback))
+}
+
+function Session_missing_table_update_callback(missed_children)
+{
+    console.log(missed_children)
+    let trs=[];
+    let tbody=document.getElementById("missing_table")
+    tbody.innerHTML=''
+    setTimeout(()=> console.log(missed_children.map(child=>tbody.append(Session_generat_table_row(child)))),200)
+}
+
+function Session_get_children(children_array,callback)
+{
+    let result_children=[];
+    let tx=window.db.transaction(['children'],'readwrite');
+    let request= tx.objectStore('children').openCursor();
+    request.onsuccess=(event)=>{
+        let cursor= event.target.result;
+        if(cursor)
+        {
+            if(children_array.includes(cursor.value.Name))
+            {
+                result_children.push(cursor.value)
+            }
+            cursor.continue()
+        }
+        else
+        {
+            // callback(result_children)
+        }
+    }
+    return result_children
+}
+
 function Session_table_manual_add_btn()
 {
     let tbody=null
     switch(Window.Session_children_add)
     {
-        case "add_to_church_table":
+        case "li_church":
             tbody=document.getElementById("church_table")
             break
-        case "add_to_home_table":
+        case "li_home":
             tbody=document.getElementById("home_table")
             break
         default:

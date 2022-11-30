@@ -104,35 +104,32 @@
     <!-- <div class=" container right-align"> -->
 
         <!-- </div> -->
-        <div class="red btn-floating session_table_action_btn disabled table_body_row_action" onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled')"><i class="material-icons">group_remove</i></div>
+        <div class="red btn-floating session_table_action_btn disabled table_body_row_action" onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0"><i class="material-icons">group_remove</i></div>
         <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
         <div class="btn-floating session_table_action_btn disabled" onclick="$('#cam').click()">
             <i class="material-icons">add_a_photo</i>
         </div>
         <!-- Modal Trigger -->
-        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled" data-target="all_registed_children" onclick="Session_cherch_table_manual_add(this)"><i class="material-icons">group_add</i></div>
+        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled" data-target="all_registed_children" ><i class="material-icons">group_add</i></div>
         
         <!-- Modal Structure -->
         <div id="all_registed_children" class="modal ">
             <div class="modal-content left-align">
                 <h4>Adding</h4>
-                
                 <div class="row">
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col s10" onfocusout="setTimeout(()=>{document.querySelector('#search_clear').classList.add('hide');console.log('focusout')},200)" oninput="document.querySelector('#search_clear').classList.remove('hide');console.log('focus')">
+                            <div class="input-field col s10" onfocusout="setTimeout(()=>{if(!Boolean( document.getElementById('autocomplete-input-search-manual-add').value))document.querySelector('#search_clear').classList.add('hide')},200)" oninput="document.querySelector('#search_clear').classList.remove('hide')">
                                 <i class="material-icons prefix">search</i>
                                 <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete" >
                                 <label for="autocomplete-input">Search for name</label>
                             </div>
-                            <button id="search_clear" class="btn-flat waves-effect waves-red col s1 hide" style="border-radius: 50%;height: width;" onclick="document.querySelector('#autocomplete-input-search-manual-add').value='';console.log('search_clear')">
+                            <button id="search_clear" class="btn-flat waves-effect waves-red col s1 hide" style="border-radius: 50%;height: width;" onclick="document.querySelector('#autocomplete-input-search-manual-add').value='';this.classList.add('hide')">
                                 <i class="material-icons">close</i>
                             </button>
                         </div>
-                        
                     </div>
                 </div>
-                
             </div>
             <div class="modal-footer">
                 <button class="indigo white-text waves-effect waves-green btn-flat" onclick="Session_table_manual_add_btn()">Add</button>
@@ -213,8 +210,22 @@
                     </div>
                 </li>
                 <li>
-                    <div class="collapsible-header"><i class="material-icons">person_search</i>Search for missing</div>
-                    <div class="collapsible-body"><span>To be implemented</span></div>
+                    <div class="collapsible-header" onfocus="Session_missing_table_update()"><i class="material-icons">person_search</i>Search for missing</div>
+                    <div class="collapsible-body">
+                        <table class="striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                    <th>Address</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="missing_table">
+                                
+                            </tbody>
+                        </table>
+                    </div>
                 </li>
             </ul>
 
