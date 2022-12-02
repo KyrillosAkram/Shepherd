@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <link rel="manifest" href="manifest.json">
+    <script defer src="face-api.min.js"></script>
     <title>Document</title>
     <style>
         .row .col {
@@ -61,7 +62,7 @@
         <div class="container">
             <ul id="slide-out" class="sidenav">
 
-                <li><a href="/index.html">Home</a></li>
+                <li class="tab"><a href="/index.html">Home</a></li>
                 <li><a href="/Registeration.html">Registeration</a></li>
                 <li><a href="/Modifing.html">Modifing</a></li>
                 <li><a href="/Registed.html">Registed</a></li>
@@ -86,9 +87,9 @@
         </div>
     </nav>
 
-<br />
+    <br />
 
-<!-- <div class="fixed-action-btn click-to-toggle">
+    <!-- <div class="fixed-action-btn click-to-toggle">
     <a class="btn-floating btn">
         <i class="large material-icons">mode_edit</i>
     </a>
@@ -100,18 +101,71 @@
     </ul>
 </div> -->
 
-<div class="container right-align">
-    <!-- <div class=" container right-align"> -->
+    <div class="container right-align">
+        <div class=" container center-align" style="padding-bottom:0px ;margin-bottom:0 ;">
+            <div id="loading_circle" class="col s1 offset-s3 preloader-wrapper small active">
+                <div class="spinner-layer spinner-blue">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
 
-        <!-- </div> -->
-        <div class="red btn-floating session_table_action_btn disabled table_body_row_action" onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0"><i class="material-icons">group_remove</i></div>
-        <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
-        <div class="btn-floating session_table_action_btn disabled" onclick="$('#cam').click()">
+                <div class="spinner-layer spinner-red">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-yellow">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+
+                <div class="spinner-layer spinner-green">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="red btn-floating session_table_action_btn disabled table_body_row_action"
+            onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0">
+            <i class="material-icons">group_remove</i>
+        </div>
+        <input id="cam" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
+        <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam').click();document.querySelector('div#loading_circle').classList.add('active')">
             <i class="material-icons">add_a_photo</i>
         </div>
-        <!-- Modal Trigger -->
-        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled" data-target="all_registed_children" ><i class="material-icons">group_add</i></div>
         
+        <!-- Modal Trigger -->
+        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled"
+            data-target="all_registed_children"><i class="material-icons">group_add</i></div>
+
         <!-- Modal Structure -->
         <div id="all_registed_children" class="modal ">
             <div class="modal-content left-align">
@@ -119,12 +173,16 @@
                 <div class="row">
                     <div class="col s12">
                         <div class="row">
-                            <div class="input-field col s10" onfocusout="setTimeout(()=>{if(!Boolean( document.getElementById('autocomplete-input-search-manual-add').value))document.querySelector('#search_clear').classList.add('hide')},200)" oninput="document.querySelector('#search_clear').classList.remove('hide')">
+                            <div class="input-field col s10"
+                                onfocusout="setTimeout(()=>{if(!Boolean( document.getElementById('autocomplete-input-search-manual-add').value))document.querySelector('#search_clear').classList.add('hide')},200)"
+                                oninput="document.querySelector('#search_clear').classList.remove('hide')">
                                 <i class="material-icons prefix">search</i>
-                                <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete" >
+                                <input type="text" id="autocomplete-input-search-manual-add" class="autocomplete">
                                 <label for="autocomplete-input">Search for name</label>
                             </div>
-                            <button id="search_clear" class="btn-flat waves-effect waves-red col s1 hide" style="border-radius: 50%;height: width;" onclick="document.querySelector('#autocomplete-input-search-manual-add').value='';this.classList.add('hide')">
+                            <button id="search_clear" class="btn-flat waves-effect waves-red col s1 hide"
+                                style="border-radius: 50%;height: width;"
+                                onclick="document.querySelector('#autocomplete-input-search-manual-add').value='';this.classList.add('hide')">
                                 <i class="material-icons">close</i>
                             </button>
                         </div>
@@ -132,10 +190,12 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="indigo white-text waves-effect waves-green btn-flat" onclick="Session_table_manual_add_btn()">Add</button>
+                <button class="indigo white-text waves-effect waves-green btn-flat"
+                    onclick="Session_table_manual_add_btn()">Add</button>
                 <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
             </div>
         </div>
+
         <!-- Dropdown Trigger -->
         <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'>
             <i class="material-icons right">more_horiz</i>
@@ -154,7 +214,7 @@
             <li><a href="#!" class="red white-text"><i class="material-icons red"
                         onclick="Session_Actions_Export()">close</i>Close</a></li>
         </ul>
-        
+
     </div>
     <div class="container center-align" id="main_content">
 
@@ -165,22 +225,22 @@
                     <div class="collapsible-header"><i class="material-icons">church</i>Going to church</div>
                     <div class="collapsible-body container">
                         <div class="row container right-align">
-                        </div>
-                        <div class="row left-align">
-
-
-                            <table class="striped">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Class</th>
-                                        <th>Address</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="church_table">
-                                </tbody>
-                            </table>
+                            <div class="row left-align">
+    
+    
+                                <table class="striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Class</th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
+    
+                                    <tbody id="church_table">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -188,29 +248,30 @@
                     <div class="collapsible-header"><i class="material-icons">home</i>Returning to home</div>
                     <div class="collapsible-body">
                         <div class="row container right-align">
-                        <div class="row left-align">
+                            <div class="row left-align">
 
 
-                            <table class="striped">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Class</th>
-                                        <th>Address</th>
-                                    </tr>
-                                </thead>
+                                <table class="striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Class</th>
+                                            <th>Address</th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody id="home_table">
-                                    
-                                </tbody>
-                            </table>
-                        </div>
+                                    <tbody id="home_table">
+
+                                    </tbody>
+                                </table>
+                            </div>
 
                         </div>
                     </div>
                 </li>
                 <li>
-                    <div class="collapsible-header" onfocus="Session_missing_table_update()"><i class="material-icons">person_search</i>Search for missing</div>
+                    <div class="collapsible-header" onfocus="Session_missing_table_update()"><i
+                            class="material-icons">person_search</i>Search for missing</div>
                     <div class="collapsible-body">
                         <table class="striped">
                             <thead>
@@ -222,16 +283,17 @@
                             </thead>
 
                             <tbody id="missing_table">
-                                
+
                             </tbody>
                         </table>
                     </div>
                 </li>
             </ul>
-
+        </div>
+        <div id="fake_div"><!--  class="hide"> -->
+    
         </div>
     </div>
-
     <script>
     </script>
     <script src="app.js"></script>

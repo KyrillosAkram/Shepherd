@@ -43,10 +43,7 @@ function App_onStartUp() {
             break;
         case "Session":
             debugging & console.log("Session");
-            // Window.all_registed_childrens=null
-            setInterval(() => {
-
-            },)
+            Session_onLoad()
             break;
         case "Setting":
             debugging & console.log("Setting");
@@ -62,13 +59,11 @@ function refresh_all_registed_childrens() {
 
     myreq.onsuccess = () => {
         Window.all_registed_childrens = myreq.result
-        let obj={}
-        for(record of Window.all_registed_childrens){
+        let obj = {}
+        for (record of Window.all_registed_childrens) {
             eval(`obj={...obj,"${record.Name}":null}`)
         }
-        console.log(obj)
-        console.log(Window.autoComplete_instances)
-        for (o of document.querySelectorAll('.autocomplete')){M.Autocomplete.getInstance(o).updateData(obj)}
+        for (o of document.querySelectorAll('.autocomplete')) { M.Autocomplete.getInstance(o).updateData(obj) }
     }
 
     debugging & console.log("refresh_all_registed_childrens");
@@ -135,6 +130,7 @@ function submit_registration() {
                         }
                     )
                     debugging & console.log("children.add");
+                    debugging & console.log(values)
 
                 })
                 window.registration_discriptor = null;
@@ -146,6 +142,16 @@ function submit_registration() {
     } else {
         M.toast({ html: "Please fill all filds !!!" })
     }
+}
+
+function Session_onLoad() {
+    let image, canvas;
+    debugging & console.log("Session_onLoad")
+    Promise.all([
+        faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
+    ]).then(() => { document.querySelector("div#loading_circle").classList.remove('active'); M.toast({ html: 'you can choose image' }) })
 }
 
 function Registeration_onLoad() {
@@ -196,23 +202,19 @@ if ('serviceWorker' in navigator) {
 /*********************************** Session ***********************************/
 // TODO: 
 
-function Session_Actions_Save()
-{
+function Session_Actions_Save() {
 
 }
 
-function Session_Actions_Load()
-{
+function Session_Actions_Load() {
 
 }
 
-function Session_Actions_Import()
-{
+function Session_Actions_Import() {
 
 }
 
-function Session_Actions_Export()
-{
+function Session_Actions_Export() {
 
 }
 
@@ -220,151 +222,208 @@ function Session_Actions_Export()
 // {
 //     Window.Session_children_add=element.id
 // }
+function Session_check_input_add(input) {
+    if (input.files.length) {
+        Session_detect_descriptors(input.files)
+    }
 
-function Session_table_add_btns_state_updater(element)
-{
-    setTimeout(()=>{
-    let session_table_action_btns=[...document.querySelectorAll(".session_table_action_btn")];
-    let active_tables=[...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active")]
-    if(active_tables.length > 0)
-    {
-        Window.Session_children_add=active_tables[0].id;
-        session_table_action_btns.map(btn => {
-            if(btn.classList.contains('red') )
-            {
-                if(Boolean(Window.session_row_selection))btn.classList.remove('disabled');
-            }
-            else
-            {
-                btn.classList.remove('disabled')
-            }
-        })
-    }
-    else
-    {
-        session_table_action_btns.map(btn => btn.classList.add('disabled'))
-    }
-},200)
 }
 
-function Session_row_selection_toggle(element)
-{
-    if (!Boolean( Window.session_row_selection))
-    {
-        Window.session_row_selection=0;
-        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'))
+function Session_detect_descriptors(buffers) {
+    Window.Session_detect_descriptors_result=[]
+    let fake=document.querySelector("div#fake_div")
+    let detected_descriotor_arr =// Promise.all(// to await faces detection
+    Promise.all(//to await image
+    [...buffers].map(faceapi.bufferToImage)
+    ).then(
+        async (images) => 
+        {   
+            for (image of images) {
+                Window.Session_detect_descriptors_result.push( await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor())
+            }
+        }
+        ).then(async()=>{
+            get_all_recoded_children()
+            Promise.all(Window.Session_detect_descriptors_result).then(
+               setTimeout( async descriptors_arrs=>{
+                    let all_recoded_children =Window.session_result_children
+                    console.log(all_recoded_children)
+                    let registed_d=all_recoded_children.map(record=> {return record.Discriptor})
+                    console.log(registed_d)
+                    let faceMatcher= new faceapi.FaceMatcher(registed_d, 0.6)
+                    let found_children=null
+                    console.log(descriptors_arrs)
+                    found_children=descriptors_arrs.flat().map(d=> faceMatcher.findBestMatch(d.descriptor))
+                    console.log(found_children.map(child_data=>child_data.toString()))
+                },10000)
+            )
+            document.querySelector('div#loading_circle').classList.remove('active');
+        }).finally(()=>document.querySelector('div#loading_circle').classList.remove('active'))
+}
+
+function Session_get_active_table() {
+    return [...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active")]
+}
+function Session_table_add_btns_state_updater(element) {
+    setTimeout(() => {
+        let session_table_action_btns = [...document.querySelectorAll(".session_table_action_btn")];
+        let active_tables = Session_get_active_table();
+        if (active_tables.length > 0) {
+            Window.Session_children_add = active_tables[0].id;
+            session_table_action_btns.map(btn => {
+                if (btn.classList.contains('red')) {
+                    if (Boolean(Window.session_row_selection)) btn.classList.remove('disabled');
+                }
+                else {
+                    btn.classList.remove('disabled')
+                }
+            })
+        }
+        else {
+            session_table_action_btns.map(btn => btn.classList.add('disabled'))
+        }
+    }, 200)
+}
+
+function Session_row_selection_toggle(element) {
+    if (!Boolean(Window.session_row_selection)) {
+        Window.session_row_selection = 0;
+        [...document.querySelectorAll('.table_body_row_action')].map(btn => btn.classList.add('disabled'))
     }
     element.classList.toggle('grey')
-    if(element.classList.contains('grey'))
-    {
+    if (element.classList.contains('grey')) {
         Window.session_row_selection++
-        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.remove('disabled'))
+        [...document.querySelectorAll('.table_body_row_action')].map(btn => btn.classList.remove('disabled'))
     }
-    else if(Window.session_row_selection > 0)
-    {
+    else if (Window.session_row_selection > 0) {
         Window.session_row_selection--
-        if(Window.session_row_selection === 0)
-        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'));
+        if (Window.session_row_selection === 0)
+            [...document.querySelectorAll('.table_body_row_action')].map(btn => btn.classList.add('disabled'));
     }
-    else
-    {
-        [...document.querySelectorAll('.table_body_row_action')].map(btn =>btn.classList.add('disabled'))
+    else {
+        [...document.querySelectorAll('.table_body_row_action')].map(btn => btn.classList.add('disabled'))
     }
 }
-function Session_tbody_to_array(tbody)
-{
-    let arr=[];
+function Session_tbody_to_array(tbody) {
+    let arr = [];
     [...tbody.querySelectorAll("td.child_name")].map(td => arr.push(td.textContent))
     return arr;
 }
 
-function Session_get_missing(big_array,small_array)
+function Session_from_active_table_get_listed_children()
 {
+    // let listed_children=[]
+    listed_children= document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active > div.collapsible-body >div > div.row.left-align > table > tbody > tr >td.child_name").map(td_child_name=>td_child_name.textContent)
+    log(listed_children)
+    return listed_children
+}
+
+function Session_get_missing(big_array, small_array) {
     return big_array.filter(child => !small_array.includes(child))
 }
 
-function Session_generat_table_row(child_record)
-{
-    let tr=document.createElement("tr")
-    tr.setAttribute('class','child_row')
-    tr.setAttribute('onclick','Session_row_selection_toggle(this)')
-    tr.setAttribute('ondblclick','console.log("dblclick action tobe implemented")')
-    let td_n=document.createElement("td")
-    td_n.setAttribute('class','child_name' )
-    td_n.append(document.createTextNode(child_record.Name ))
+function Session_generat_table_row(child_record) {
+    let tr = document.createElement("tr")
+    tr.setAttribute('class', 'child_row')
+    tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
+    tr.setAttribute('ondblclick', 'console.log("dblclick action tobe implemented")')
+    let td_n = document.createElement("td")
+    td_n.setAttribute('class', 'child_name')
+    td_n.append(document.createTextNode(child_record.Name))
     tr.appendChild(td_n)
-    let td_c=document.createElement("td")
-    td_c.setAttribute('class','child_class' )
-    td_c.append(document.createTextNode(child_record.Class ))
+    let td_c = document.createElement("td")
+    td_c.setAttribute('class', 'child_class')
+    td_c.append(document.createTextNode(child_record.Class))
     tr.appendChild(td_c)
-    td_c=document.createElement("td")
-    td_c.setAttribute('class','child_Address' )
-    td_c.append(document.createTextNode(child_record.Address ))
+    td_c = document.createElement("td")
+    td_c.setAttribute('class', 'child_Address')
+    td_c.append(document.createTextNode(child_record.Address))
     tr.appendChild(td_c)
     // tr.appendChild(document.createElement("td").setAttribute('class','child_class').append(document.createTextNode(child_record.Class)))
-    
+
     return tr
 }
 
-function Session_missing_table_update()
-{
-    let big_arr= Session_tbody_to_array(document.querySelector("#church_table"))
-    let small_arr= Session_tbody_to_array(document.querySelector("#home_table"))
-    Session_missing_table_update_callback(Session_get_children(Session_get_missing(big_arr,small_arr),Session_missing_table_update_callback))
+function Session_missing_table_update() {
+    let big_arr = Session_tbody_to_array(document.querySelector("#church_table"))
+    let small_arr = Session_tbody_to_array(document.querySelector("#home_table"))
+    Session_missing_table_update_callback(Session_get_children(Session_get_missing(big_arr, small_arr), Session_missing_table_update_callback))
 }
 
-function Session_missing_table_update_callback(missed_children)
-{
+function Session_missing_table_update_callback(missed_children) {
     console.log(missed_children)
-    let trs=[];
-    let tbody=document.getElementById("missing_table")
-    tbody.innerHTML=''
-    setTimeout(()=> console.log(missed_children.map(child=>tbody.append(Session_generat_table_row(child)))),200)
+    let trs = [];
+    let tbody = document.getElementById("missing_table")
+    tbody.innerHTML = ''
+    setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row(child)))), 200)
 }
 
-function Session_get_children(children_array,callback)
+function get_all_recoded_children()
 {
-    let result_children=[];
-    let tx=window.db.transaction(['children'],'readwrite');
-    let request= tx.objectStore('children').openCursor();
+    let result_children=null
+    Window.session_result_children=null
+    tx=window.db.transaction(['children'],'readwrite')
+    ob=tx.objectStore('children')
+    const request=ob.getAll()
     request.onsuccess=(event)=>{
-        let cursor= event.target.result;
-        if(cursor)
-        {
-            if(children_array.includes(cursor.value.Name))
-            {
+        console.log(event.target.result)
+        result_children= event.target.result
+        Window.session_result_children=event.target.result
+    }
+//     while(request.readyState!='done'){
+//     // // await request
+//     // await tx.done
+
+//     console.log(request)
+//     console.log(result_children)
+// }
+    return result_children
+    // return request
+}
+function Session_get_children(children_array, callback) {
+    let result_children = [];
+    let tx = window.db.transaction(['children'], 'readwrite');
+    let request = tx.objectStore('children').openCursor();
+    request.onsuccess = (event) => {
+        let cursor = event.target.result;
+        if (cursor) {
+            if (children_array.includes(cursor.value.Name)) {
                 result_children.push(cursor.value)
             }
             cursor.continue()
         }
-        else
-        {
+        else {
             // callback(result_children)
         }
     }
     return result_children
 }
 
-function Session_table_manual_add_btn()
-{
-    let tbody=null
-    switch(Window.Session_children_add)
-    {
+function Session_table_manual_add_btn() {
+    let tbody = null
+    switch (Window.Session_children_add) {
         case "li_church":
-            tbody=document.getElementById("church_table")
+            tbody = document.getElementById("church_table")
             break
-        case "li_home":
-            tbody=document.getElementById("home_table")
+        case "li_home" :
+            tbody = document.getElementById("home_table")
             break
         default:
             return
             break
     }
     console.log(tbody)
-    let request= window.db.transaction(["children"],"readwrite").objectStore("children").get(document.querySelector("#autocomplete-input-search-manual-add").value)
-    request.onsuccess=()=>{
+    let request = window.db.transaction(["children"], "readwrite").objectStore("children").get(document.querySelector("#autocomplete-input-search-manual-add").value)
+    request.onsuccess = () => {
         tbody.appendChild(Session_generat_table_row(request.result))
     }
+}
+
+function Session_active_table_add_children(children_name)
+{
+    let active_table_existed_children=Session_from_active_table_get_listed_children();
+
+    
 }
 /********************************************************************************/
 
@@ -389,11 +448,11 @@ $("nav").addClass(primer_color_theme)
 
 Window.Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'));
 Window.Modal_instances = M.Modal.init(document.querySelectorAll('.modal'));
-Window.autoComplete_instances = M.Autocomplete.init(document.querySelectorAll('.autocomplete',{data:{}}));
-Window.FAB_instances=M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'),{
+Window.autoComplete_instances = M.Autocomplete.init(document.querySelectorAll('.autocomplete', { data: {} }));
+Window.FAB_instances = M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'), {
     direction: 'up',
     hoverEnabled: false
-  } );
+});
 Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
 
 M.AutoInit();
