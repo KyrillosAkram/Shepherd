@@ -228,36 +228,36 @@ function Session_check_input_add(input) {
 
 }
 
-function Session_detect_descriptors(buffers) {
-    Window.Session_detect_descriptors_result=[]
-    let fake=document.querySelector("div#fake_div")
-    let detected_descriotor_arr =// Promise.all(// to await faces detection
-    Promise.all(//to await image
-    [...buffers].map(faceapi.bufferToImage)
-    ).then(
-        async (images) => 
-        {   
-            for (image of images) {
-                Window.Session_detect_descriptors_result.push( await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor())
-            }
+async function Session_detect_descriptors(buffers) {
+    try {
+        Window.Session_detect_descriptors_result = []
+        let fake = document.querySelector("div#fake_div")
+        let detected_descriotor_arr = await Promise.all(//to await image
+            [...buffers].map(faceapi.bufferToImage)
+        )
+        for (image of detected_descriotor_arr ) {
+            Window.Session_detect_descriptors_result.push(await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors())
         }
-        ).then(async()=>{
-            get_all_recoded_children()
-            Promise.all(Window.Session_detect_descriptors_result).then(
-               setTimeout( async descriptors_arrs=>{
-                    let all_recoded_children =Window.session_result_children
-                    console.log(all_recoded_children)
-                    let registed_d=all_recoded_children.map(record=> {return record.Discriptor})
-                    console.log(registed_d)
-                    let faceMatcher= new faceapi.FaceMatcher(registed_d, 0.6)
-                    let found_children=null
-                    console.log(descriptors_arrs)
-                    found_children=descriptors_arrs.map(d=> faceMatcher.findBestMatch(d.descriptor))
-                    console.log(found_children.map(child_data=>child_data.toString()))
-                },10000)
-            )
-            document.querySelector('div#loading_circle').classList.remove('active');
-        }).finally(()=>document.querySelector('div#loading_circle').classList.remove('active'))
+        console.log(Window.Session_detect_descriptors_result)
+        const descriptors_arrs=Window.Session_detect_descriptors_result.flat()
+        console.log(descriptors_arrs)
+        let all_recoded_children=await get_all_recoded_children()
+        console.log(all_recoded_children)
+        let registed_d = all_recoded_children.map(record => { return record.Discriptor })
+        console.log(registed_d)
+        let faceMatcher = new faceapi.FaceMatcher(registed_d, 0.6)
+        let found_children = null
+        found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
+        console.log(found_children) //.map(child_data => child_data.toString()))
+    }
+    catch (error)
+    {
+        console.error(error)
+    }
+    finally
+    {
+        document.querySelector('div#loading_circle').classList.remove('active');
+    }
 }
 
 function Session_get_active_table() {
@@ -357,20 +357,18 @@ function Session_missing_table_update_callback(missed_children) {
     setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row(child)))), 200)
 }
 
-function get_all_recoded_children()
+async function get_all_recoded_children()
 {
     let result_children=null
     Window.session_result_children=null
-    tx=window.db.transaction(['children'],'readwrite')
-    ob=tx.objectStore('children')
-    const request=ob.getAll()
-    request.onsuccess=(event)=>{
-        result_children= event.target.result.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})
-        Window.session_result_children=result_children
-        console.log(result_children)
-    }
-    return result_children
+    const myidb= idb.wrap(window.db)
+    ob=myidb.transaction(['children'],'readwrite').objectStore('children')
+    let request=await ob.getAll()
+    request=request.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})
+    return request
 }
+
+
 function Session_get_children(children_array, callback) {
     let result_children = [];
     let tx = window.db.transaction(['children'], 'readwrite');
