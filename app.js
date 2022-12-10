@@ -131,7 +131,6 @@ function submit_registration() {
                     )
                     debugging & console.log("children.add");
                     debugging & console.log(values)
-
                 })
                 window.registration_discriptor = null;
             } catch (error) {
@@ -253,7 +252,7 @@ function Session_detect_descriptors(buffers) {
                     let faceMatcher= new faceapi.FaceMatcher(registed_d, 0.6)
                     let found_children=null
                     console.log(descriptors_arrs)
-                    found_children=descriptors_arrs.flat().map(d=> faceMatcher.findBestMatch(d.descriptor))
+                    found_children=descriptors_arrs.map(d=> faceMatcher.findBestMatch(d.descriptor))
                     console.log(found_children.map(child_data=>child_data.toString()))
                 },10000)
             )
@@ -366,19 +365,11 @@ function get_all_recoded_children()
     ob=tx.objectStore('children')
     const request=ob.getAll()
     request.onsuccess=(event)=>{
-        console.log(event.target.result)
-        result_children= event.target.result
-        Window.session_result_children=event.target.result
+        result_children= event.target.result.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})
+        Window.session_result_children=result_children
+        console.log(result_children)
     }
-//     while(request.readyState!='done'){
-//     // // await request
-//     // await tx.done
-
-//     console.log(request)
-//     console.log(result_children)
-// }
     return result_children
-    // return request
 }
 function Session_get_children(children_array, callback) {
     let result_children = [];
