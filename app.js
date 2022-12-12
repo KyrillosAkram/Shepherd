@@ -249,7 +249,8 @@ async function Session_detect_descriptors(buffers) {
         let found_children = null
         found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
         console.log(found_children) //.map(child_data => child_data.toString()))
-    }
+        Session_active_table_add_children(found_children.map(child=>child._label))
+        }
     catch (error)
     {
         console.error(error)
@@ -312,8 +313,8 @@ function Session_tbody_to_array(tbody) {
 function Session_from_active_table_get_listed_children()
 {
     // let listed_children=[]
-    listed_children= document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active > div.collapsible-body >div > div.row.left-align > table > tbody > tr >td.child_name").map(td_child_name=>td_child_name.textContent)
-    log(listed_children)
+    listed_children= [...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active > div.collapsible-body >div > div.row.left-align > table > tbody > tr >td.child_name")].map(td_child_name=>td_child_name.textContent)
+    console.log(listed_children)
     return listed_children
 }
 
@@ -408,11 +409,33 @@ function Session_table_manual_add_btn() {
     }
 }
 
-function Session_active_table_add_children(children_name)
+async function Session_active_table_add_children(children_name)
 {
+    children_name=children_name.filter(child=>child!=="unknown")
+    const db=idb.wrap(window.db)
+    const obj=db.transaction('children', 'readwrite').objectStore('children')
     let active_table_existed_children=Session_from_active_table_get_listed_children();
-
-    
+    let active_table_body = Session_get_active_table()[0].getElementsByTagName("tbody")[0];
+    if(active_table_existed_children.length>0)
+    {
+        for (child of children_name)
+        {
+            if(! active_table_existed_children.includes(child))
+            {
+                active_table_body.append(Session_generat_table_row(await obj.get(child)))
+            }
+        }
+    }
+    else
+    {
+        for (child of children_name)
+        {
+            if(! active_table_existed_children.includes(child))
+            {
+                active_table_body.append(Session_generat_table_row(await obj.get(child)))
+            }
+        }
+    }
 }
 /********************************************************************************/
 
