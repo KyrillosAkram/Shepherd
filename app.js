@@ -108,29 +108,35 @@ function x(e) {
 
 function submit_registration() {
     let check_counter = 5
-    Boolean($("#cam").val()) ? check_counter-- : M.toast({ html: "please select/take image" });
-    (Boolean($("#Name").val())) ? check_counter-- : M.toast({ html: "please enter the name" });
-    (Boolean($("#Address").val())) ? check_counter-- : M.toast({ html: "please enter the address" });
-    (Boolean($("#Location").val())) ? check_counter-- : M.toast({ html: "please enter the location" });
-    (Boolean($("#Class").val())) ? check_counter-- : M.toast({ html: "please choose class" });
+    Boolean(document.querySelector("#cam").value) ? check_counter-- : M.toast({ html: "please select/take image" });
+    (Boolean(document.querySelector("#Name").value)) ? check_counter-- : M.toast({ html: "please enter the name" });
+    (Boolean(document.querySelector("#Address").value)) ? check_counter-- : M.toast({ html: "please enter the address" });
+    (Boolean(document.querySelector("#Location").value)) ? check_counter-- : M.toast({ html: "please enter the location" });
+    (Boolean(document.querySelector("#Class").value)) ? check_counter-- : M.toast({ html: "please choose class" });
     if (!check_counter) {// if all checks are ok
         if (Boolean(window.db)) {
             try {
                 let trx = window.db.transaction("children", "readwrite")
                 let children = trx.objectStore("children");
-                Promise.all([new faceapi.LabeledFaceDescriptors($("#Name").val(), [window.registration_discriptor.descriptor])]).then((values) => {
+                Promise.all([new faceapi.LabeledFaceDescriptors(document.querySelector("#Name").value, [window.registration_discriptor.descriptor])]).then((values) => {
                     children.add(
                         {
-                            Name: $("#Name").val(),
-                            Address: $("#Address").val(),
-                            Location: $("#Location").val(),
-                            Class: $("#Class").val(),
+                            Name:document.querySelector("#Name").value,
+                            Address:document.querySelector("#Address").value,
+                            Location:document.querySelector("#Location").value,
+                            Class:document.querySelector("#Class").value,
                             Discriptor: values[0],
-                            // Discriptor  :window.registration_discriptor,
                         }
                     )
                     debugging & console.log("children.add");
                     debugging & console.log(values)
+                    document.querySelector("#Name").value=''
+                    document.querySelector("#Address").value=''
+                    document.querySelector("#Location").value=''
+                    document.querySelector("#Class").value='?'
+                    document.querySelector("li.selected").classList.remove("selected")
+                    document.querySelector("li.disabled").classList.add("selected")
+                    document.querySelector("#registeration_submit").classList.add("disabled")
                 })
                 window.registration_discriptor = null;
             } catch (error) {
@@ -173,20 +179,12 @@ function Registeration_onLoad() {
             image = await faceapi.bufferToImage(cam.files[0])
 
             container.append(image)
-            // canvas = faceapi.createCanvasFromMedia(image)
-            // container.append(canvas)
-            // var det=await ;
-            // registration_discriptor.push(await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().discriptor);
             faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then((event) => {
                 console.log(event)
                 window.registration_discriptor = { ...event }
                 debugging & console.log("remove disable");
                 $("#registeration_submit").removeClass("disabled")
             })
-            /*.then((evnet)=>{
-                return event;
-            })*/
-
         })
     })
 }
@@ -199,7 +197,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /*********************************** Session ***********************************/
-// TODO: 
+/* TODO: implement Session action
+- [✔] done
+*/
+
 
 function Session_Actions_Save() {
 

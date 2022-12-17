@@ -9,7 +9,8 @@
   
   "theme_color": "  ",
   "orientation": "portrait-primary",
-  "icons": [{
+  "icons": [
+    {
     "src": "img/icons8-calculator-48(-ldpi).png",
     "sizes": "46x46",
     "type": "image/png"

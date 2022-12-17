@@ -10,13 +10,19 @@ def home():
 
 @app.route("/<filename>",methods=['GET'])
 def getfile(filename):
-    #print(filename)
-    return send_file(filename)
+    try:
+        return send_file(filename)
+        pass
+    except:
+        print(f"this file \'{filename}\' not found")
 
 @app.route("/<dirname>/<filename>",methods=['GET'])
 def getfileNdir(dirname,filename):
-    #print(dirname ,filename)
-    return send_file('./'+dirname+'/'+filename)
+    try:
+        return send_file('./'+dirname+'/'+filename)
+        pass
+    except:
+        print(f"this file \'{filename}\' not found")
 
 
 if __name__ == '__main__':
