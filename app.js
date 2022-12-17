@@ -203,7 +203,7 @@ if ('serviceWorker' in navigator) {
 
 
 function Session_Actions_Save() {
-
+    
 }
 
 function Session_Actions_Load() {
@@ -215,7 +215,33 @@ function Session_Actions_Import() {
 }
 
 function Session_Actions_Export() {
+    // var blob = new Blob([Session_tables_to_obj()], { type: "text/plain;charset=utf-8" });
+    // saveAs(blob, "session"+Date.now().toString()+".json");
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Session_tables_to_obj()));
+    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("download", "session"+Date.now().toString()+".json");
+    dlAnchorElem.click();
 
+}
+
+function Session_tables_to_obj()
+{
+    return {
+        church_table: [...document.querySelector("#church_table").getElementsByTagName("tr")].map(childRow_to_obj),
+        home_table:[...document.querySelector("#home_table").getElementsByTagName("tr")].map(childRow_to_obj),
+        missing_table:[...document.querySelector("#missing_table").getElementsByTagName("tr")].map(childRow_to_obj)
+    }
+}
+
+function childRow_to_obj(tr)
+{
+    let tds=tr.getElementsByTagName("td")
+    return {
+        child_name:tds[0].innerText,
+        child_class:tds[1].innerText,
+        child_Address:tds[2].innerText
+    }
 }
 
 // function Session_cherch_table_manual_add(element)
