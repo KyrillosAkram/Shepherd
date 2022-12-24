@@ -202,21 +202,56 @@ if ('serviceWorker' in navigator) {
 */
 
 
-function Session_Actions_Save() {
-    
+function Session_Actions_Save() 
+{
+    localStorage.setItem("last_session",JSON.stringify(Session_tables_to_obj()))
 }
 
-function Session_Actions_Load() {
+function Session_Actions_Load() 
+{
+    last_session=localStorage.getItem("last_session")
+    last_session=last_session?JSON.parse(last_session):null;
+    if(last_session)
+    {
+        if(last_session.church_table)
+            {
+                church_table=document.querySelector("tbody#church_table")
+                home_table=document.querySelector("tbody#home_table")
+                missing_table=document.querySelector("tbody#missing_table")
+                if(last_session.church_table.length)
+                {
+                    for(child of last_session.church_table)
+                    {
+                        church_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+                if(last_session.home_table.length)
+                {
+                    for(child of last_session.home_table)
+                    {
+                        home_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+                if(last_session.missing_table.length)
+                {
+                    for(child of last_session.missing_table)
+                    {
+                        missing_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+
+            }
+    }
 
 }
 
-function Session_Actions_Import() {
-
+function Session_Actions_Import()
+{
+    document.querySelector("input#json_input").click()
 }
 
-function Session_Actions_Export() {
-    // var blob = new Blob([Session_tables_to_obj()], { type: "text/plain;charset=utf-8" });
-    // saveAs(blob, "session"+Date.now().toString()+".json");
+function Session_Actions_Export()
+{
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Session_tables_to_obj()));
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href",     dataStr     );
@@ -248,8 +283,10 @@ function childRow_to_obj(tr)
 // {
 //     Window.Session_children_add=element.id
 // }
-function Session_check_input_add(input) {
-    if (input.files.length) {
+function Session_check_input_add(input)
+{
+    if (input.files.length)
+    {
         Session_detect_descriptors(input.files)
     }
 
@@ -345,11 +382,96 @@ function Session_from_active_table_get_listed_children()
     return listed_children
 }
 
-function Session_get_missing(big_array, small_array) {
+function Session_get_missing(big_array, small_array)
+{
     return big_array.filter(child => !small_array.includes(child))
 }
 
-function Session_generat_table_row(child_record) {
+async function Session_check_import_json(input_element)
+{
+    try
+    {
+        if (input_element.files.length)
+        {
+            json_content=await read_file_as_string(input_element.files[0])        
+            sessionObj = JSON.parse(json_content)
+            if(sessionObj.church_table)
+            {
+                church_table=document.querySelector("tbody#church_table")
+                home_table=document.querySelector("tbody#home_table")
+                missing_table=document.querySelector("tbody#missing_table")
+                if(sessionObj.church_table.length)
+                {
+                    for(child of sessionObj.church_table)
+                    {
+                        church_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+                if(sessionObj.home_table.length)
+                {
+                    for(child of sessionObj.home_table)
+                    {
+                        home_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+                if(sessionObj.missing_table.length)
+                {
+                    for(child of sessionObj.missing_table)
+                    {
+                        missing_table.append(Session_generat_table_row_from_childObj(child))
+                    }
+                }
+
+            }
+        }
+    }
+    catch(any)
+    {
+        console.error(any)
+    }
+}
+
+function read_file_as_string(file)
+{
+    let reader=new FileReader()
+    return new Promise((resolve,reject)=>
+    {
+        reader.onerror=()=>
+        {
+            reject(new DOMException("Problem parsing input file."))
+        }
+        reader.onload=()=>
+        {
+            resolve(reader.result)
+        }
+        reader.readAsText(file)
+    })
+}
+
+function Session_generat_table_row_from_childObj(childObj)
+{
+    let tr = document.createElement("tr")
+    tr.setAttribute('class', 'child_row')
+    tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
+    tr.setAttribute('ondblclick', 'console.log("dblclick action tobe implemented")')
+    let td_n = document.createElement("td")
+    td_n.setAttribute('class', 'child_name')
+    td_n.append(document.createTextNode(childObj.child_name))
+    tr.appendChild(td_n)
+    let td_c = document.createElement("td")
+    td_c.setAttribute('class', 'child_class')
+    td_c.append(document.createTextNode(childObj.child_class))
+    tr.appendChild(td_c)
+    td_c = document.createElement("td")
+    td_c.setAttribute('class', 'child_Address')
+    td_c.append(document.createTextNode(childObj.child_Address))
+    tr.appendChild(td_c)
+    // tr.appendChild(document.createElement("td").setAttribute('class','child_class').append(document.createTextNode(child_record.Class)))
+
+    return tr
+}
+
+function Session_generat_table_row_from_record(child_record) {
     let tr = document.createElement("tr")
     tr.setAttribute('class', 'child_row')
     tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
@@ -382,7 +504,7 @@ function Session_missing_table_update_callback(missed_children) {
     let trs = [];
     let tbody = document.getElementById("missing_table")
     tbody.innerHTML = ''
-    setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row(child)))), 200)
+    setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row_from_record(child)))), 200)
 }
 
 async function get_all_recoded_children()
@@ -432,7 +554,7 @@ function Session_table_manual_add_btn() {
     console.log(tbody)
     let request = window.db.transaction(["children"], "readwrite").objectStore("children").get(document.querySelector("#autocomplete-input-search-manual-add").value)
     request.onsuccess = () => {
-        tbody.appendChild(Session_generat_table_row(request.result))
+        tbody.appendChild(Session_generat_table_row_from_record(request.result))
     }
 }
 
@@ -449,7 +571,7 @@ async function Session_active_table_add_children(children_name)
         {
             if(! active_table_existed_children.includes(child))
             {
-                active_table_body.append(Session_generat_table_row(await obj.get(child)))
+                active_table_body.append(Session_generat_table_row_from_record(await obj.get(child)))
             }
         }
     }
@@ -459,7 +581,7 @@ async function Session_active_table_add_children(children_name)
         {
             if(! active_table_existed_children.includes(child))
             {
-                active_table_body.append(Session_generat_table_row(await obj.get(child)))
+                active_table_body.append(Session_generat_table_row_from_record(await obj.get(child)))
             }
         }
     }

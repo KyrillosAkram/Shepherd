@@ -11,15 +11,23 @@ desc
 - create modifing  
 - create registed  
 - change Home  
+- implement Backup the database  
+- implement View and Edit the database  
+- implement Synchronization Sessio  <multiple persons can work togethe>  
+- implement Session Contributors  
+- implement Dash board  
+- implement Session status <collecting, to church , in church , to home , reached home ,finish>  
+- (C) Document app.js with doxgen @Enhancement  
+- (B) add birthday to registration @Enhancement  
+- (B) add parent whatsapp to registration  @Enhancement  
 
 ### in progress
 
-- (A) Implement Session save,load,import +Session @Implementation  
 
 ### Done
 
-- remove the old calculator {cm:2022-12-17}
-- (A) Implement Session export +Session @Implementation  {cm:2022-12-17}  
-- fix close dropmenu issue {cm:2022-12-17}
-- fix fields clearing after Submit +Registeration @Issue {cm:2022-12-17}  
+- (B) Implement Session save+Session @Implementation  {cm:2022-12-25}  
+- (B) Implement Session load +Session @Implementation  {cm:2022-12-25}  
+- (A) Implement Session import +Session @Implementation  {start:2022-12-24T16:24:40} {cm:2022-12-24} {duration:03h34m}  
+- (D) init README.md  
 
