@@ -15,7 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
     <link rel="manifest" href="manifest.json">
-    <script defer src="face-api.min.js"></script>
+    <!-- <script defer src="face-api.min.js"></script> -->
     <title>Document</title>
     <style>
         .row .col {
@@ -76,7 +76,7 @@
                 <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
             </ul>
             <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-            <a href="#" class="brand-logo">Session</a>
+            <a href="#" class="brand-logo">Registed</a>
             <ul class="right hide-on-med-and-down">
                 <li><a href="/index.html">Home</a></li>
                 <li><a href="/Registeration.html">Registeration</a></li>
@@ -103,7 +103,7 @@
 </div> -->
 
     <div class="container right-align">
-        <div class=" container center-align" style="padding-bottom:0px ;margin-bottom:0 ;">
+        <!-- <div class=" container center-align" style="padding-bottom:0px ;margin-bottom:0 ;">
             <div id="loading_circle" class="col s1 offset-s3 preloader-wrapper small active">
                 <div class="spinner-layer spinner-blue">
                     <div class="circle-clipper left">
@@ -153,22 +153,22 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="red btn-floating session_table_action_btn disabled table_body_row_action"
             onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0">
             <i class="material-icons">group_remove</i>
         </div>
-        <input id="cam" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
+        <!-- <input id="cam" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
         <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam').click();document.querySelector('div#loading_circle').classList.add('active')">
             <i class="material-icons">add_a_photo</i>
-        </div>
+        </div> -->
         
         <!-- Modal Trigger -->
-        <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled"
-            data-target="all_registed_children"><i class="material-icons">group_add</i></div>
+        <!-- <div id="add_to_church_table" class="btn-floating modal-trigger session_table_action_btn disabled"
+            data-target="all_registed_children"><i class="material-icons">group_add</i></div> -->
 
         <!-- Modal Structure -->
-        <div id="all_registed_children" class="modal ">
+        <!-- <div id="all_registed_children" class="modal ">
             <div class="modal-content left-align">
                 <h4>Adding</h4>
                 <div class="row">
@@ -195,7 +195,7 @@
                     onclick="Session_table_manual_add_btn()">Add</button>
                 <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
             </div>
-        </div>
+        </div> -->
 
         <!-- Dropdown Trigger -->
         <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'>
@@ -218,79 +218,19 @@
 
     </div>
     <div class="container center-align" id="main_content">
-
-        <div class="row">
-
-            <ul class="collapsible" onclick="Session_table_add_btns_state_updater(this)">
-                <li id="li_church" class="collapsible_li_table">
-                    <div class="collapsible-header"><i class="material-icons">church</i>Going to church</div>
-                    <div class="collapsible-body container">
-                        <div class="row container right-align">
-                            <div class="row left-align">
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
     
-    
-                                <table class="striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Class</th>
-                                            <th>Address</th>
-                                        </tr>
-                                    </thead>
-    
-                                    <tbody id="church_table">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li id="li_home" class="collapsible_li_table">
-                    <div class="collapsible-header"><i class="material-icons">home</i>Returning to home</div>
-                    <div class="collapsible-body">
-                        <div class="row container right-align">
-                            <div class="row left-align">
+            <tbody id="registed_table">
+            </tbody>
+        </table>
 
-
-                                <table class="striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Class</th>
-                                            <th>Address</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody id="home_table">
-
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="collapsible-header" onfocus="Session_missing_table_update()"><i
-                            class="material-icons">person_search</i>Search for missing</div>
-                    <div class="collapsible-body">
-                        <table class="striped">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Class</th>
-                                    <th>Address</th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="missing_table">
-
-                            </tbody>
-                        </table>
-                    </div>
-                </li>
-            </ul>
-        </div>
         <div id="fake_div"><!--  class="hide"> -->
             <a  id="downloadAnchorElem" class="hide" style="display:none"></a>
             <input type="file" id="json_input" class="hide" accept=".json,application/json" onchange="Session_check_import_json(this)">

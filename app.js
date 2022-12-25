@@ -10,7 +10,7 @@ var pages = {
     Setting: { page_content: {} }
 }
 var registration_discriptor = [];
-function App_onStartUp() {
+async function App_onStartUp() {
     // TODO : run loadup codevar db;
     let request = window.indexedDB.open("sefain_brain", 1);
     request.onupgradeneeded = (event) => {
@@ -27,7 +27,7 @@ function App_onStartUp() {
         debugging & console.log("successful");
     };
     request.onerror = (event) => { alert("errooooooooooooooooooooor") }
-    switch ($("a.brand-logo").html()) {
+    switch (document.querySelector("a.brand-logo").innerHTML) {
         case "index":
             debugging & console.log("index");
             break;
@@ -40,10 +40,11 @@ function App_onStartUp() {
             break;
         case "Registed":
             debugging & console.log("Registed");
+            Registed_onLoad();
             break;
         case "Session":
             debugging & console.log("Session");
-            Session_onLoad()
+            Session_onLoad();
             break;
         case "Setting":
             debugging & console.log("Setting");
@@ -52,6 +53,54 @@ function App_onStartUp() {
             debugging & console.log($("a.brand-logo").html());
             break;
     }
+}
+async function Registed_onLoad()
+{
+    try
+    {
+        // let result_children=null
+        // Window.session_result_children=null
+        const myidb= idb.wrap(await open_db("sefain_brain"))
+        ob=myidb.transaction(['children'],'readwrite').objectStore('children')
+        let children_records=await ob.getAll()
+        let registed_table=document.querySelector("tbody#registed_table")
+        for (child_record of children_records)
+        {
+            registed_table.append(Session_generat_table_row_from_record(child_record));
+        }
+    }
+    catch(any)
+    {
+        console.error(any)
+    }
+}
+async function open_db(db_name) 
+{
+    let request = window.indexedDB.open("sefain_brain", 1);
+    return new Promise((resolve,reject)=>
+    {
+
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            // const tx=db.transaction("notes","write");
+            let children = db.createObjectStore("children", { keyPath: "Name" });
+    
+            debugging & console.log("upgrade called")
+        };
+        request.onsuccess = (event) => {
+            var db = event.target.result;
+            window.db = db;// backward compatiblity
+            refresh_all_registed_childrens()
+            debugging & console.log("successful");
+            resolve(db)
+        };
+        request.onerror = (event) => 
+        { 
+            alert("errooooooooooooooooooooor") 
+            reject(event)
+        }
+    })
+
 }
 function refresh_all_registed_childrens() {
     let myreq = window.db.transaction(["children"], "readwrite").objectStore("children").getAll()
@@ -516,7 +565,8 @@ async function get_all_recoded_children()
 {
     let result_children=null
     Window.session_result_children=null
-    const myidb= idb.wrap(window.db)
+
+    const myidb= idb.wrap(indexedDB.open())
     ob=myidb.transaction(['children'],'readwrite').objectStore('children')
     let request=await ob.getAll()
     request=request.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})
