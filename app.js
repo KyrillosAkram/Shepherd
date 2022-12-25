@@ -107,12 +107,14 @@ function x(e) {
 }
 
 function submit_registration() {
-    let check_counter = 5
+    let check_counter =7 
     Boolean(document.querySelector("#cam").value) ? check_counter-- : M.toast({ html: "please select/take image" });
     (Boolean(document.querySelector("#Name").value)) ? check_counter-- : M.toast({ html: "please enter the name" });
     (Boolean(document.querySelector("#Address").value)) ? check_counter-- : M.toast({ html: "please enter the address" });
     (Boolean(document.querySelector("#Location").value)) ? check_counter-- : M.toast({ html: "please enter the location" });
     (Boolean(document.querySelector("#Class").value)) ? check_counter-- : M.toast({ html: "please choose class" });
+    (Boolean(document.querySelector("#telephone").value)) ? check_counter-- : M.toast({ html: "please enter the telephone" });
+    (Boolean(document.querySelector("#birthdate").value)) ? check_counter-- : M.toast({ html: "please enter the birthdate" });
     if (!check_counter) {// if all checks are ok
         if (Boolean(window.db)) {
             try {
@@ -126,6 +128,8 @@ function submit_registration() {
                             Location:document.querySelector("#Location").value,
                             Class:document.querySelector("#Class").value,
                             Discriptor: values[0],
+                            Telephone:document.querySelector("#telephone").value,
+                            Birthdate:document.querySelector("#birthdate").value
                         }
                     )
                     debugging & console.log("children.add");
@@ -160,6 +164,7 @@ function Session_onLoad() {
 }
 
 function Registeration_onLoad() {
+    Window.Birthdate_instances = M.Datepicker.init(document.querySelectorAll('.datepicker'),{format:"dd-mm-yyyy"});
     let image, canvas;
     debugging & console.log("Registeration_onLoad")
     Promise.all([
@@ -197,10 +202,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /*********************************** Session ***********************************/
-/* TODO: implement Session action
-- [✔] done
-*/
-
+function generate_direction(latitude_longitude)
+{
+    return "https://www.google.com/maps/dir//latitude_longitude/"
+}
 
 function Session_Actions_Save() 
 {
@@ -615,7 +620,7 @@ Window.FAB_instances = M.FloatingActionButton.init(document.querySelectorAll('.f
     hoverEnabled: false
 });
 Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
-
+setTimeout(()=>{Window.Birthdate_instances = M.Datepicker.init(document.querySelectorAll('.datepicker'),{format:"dd-mm-yyyy"});},1000)
 M.AutoInit();
 
 /********************************************************************************/
