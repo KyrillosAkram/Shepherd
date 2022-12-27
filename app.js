@@ -118,6 +118,21 @@ function refresh_all_registed_childrens() {
     debugging & console.log("refresh_all_registed_childrens");
 }
 
+async function get_all_recoded_children()
+{
+    try
+    {
+        const myidb= idb.wrap(await open_db("sefain_brain"))
+        ob=myidb.transaction(['children'],'readwrite').objectStore('children')
+        let request=await ob.getAll()
+        return request
+    }
+    catch(any)
+    {
+        console.error(any)
+    }
+}
+
 function swap_current_page_content(event) {
     pages[current_page].page_content = $("#main_container")
 }
@@ -183,12 +198,15 @@ function submit_registration() {
                     )
                     debugging & console.log("children.add");
                     debugging & console.log(values)
+                    window.registration_discriptor=null
                     document.querySelector("#Name").value=''
                     document.querySelector("#Address").value=''
                     document.querySelector("#Location").value=''
                     document.querySelector("#Class").value='?'
                     document.querySelector("li.selected").classList.remove("selected")
                     document.querySelector("li.disabled").classList.add("selected")
+                    document.querySelector("#telephone").value=''
+                    document.querySelector("#birthdate").value=''
                     document.querySelector("#registeration_submit").classList.add("disabled")
                 })
                 window.registration_discriptor = null;
@@ -317,10 +335,63 @@ function Session_Actions_Export()
 function Session_tables_to_obj()
 {
     return {
-        church_table: [...document.querySelector("#church_table").getElementsByTagName("tr")].map(childRow_to_obj),
-        home_table:[...document.querySelector("#home_table").getElementsByTagName("tr")].map(childRow_to_obj),
-        missing_table:[...document.querySelector("#missing_table").getElementsByTagName("tr")].map(childRow_to_obj)
+        church_table    :[...document.querySelector("#church_table" ).getElementsByTagName("tr")].map(childRow_to_obj),
+        home_table      :[...document.querySelector("#home_table"   ).getElementsByTagName("tr")].map(childRow_to_obj),
+        missing_table   :[...document.querySelector("#missing_table").getElementsByTagName("tr")].map(childRow_to_obj)
     }
+}
+async function Registed_table_refresh()
+{
+    const myidb= idb.wrap(await open_db("sefain_brain"))
+    ob=myidb.transaction(['children'],'readwrite').objectStore('children')
+    let children_records = await ob.getAll()
+    let registed_table = document.querySelector("tbody#registed_table")
+    registed_table.innerHTML = ''
+    for (child_record of children_records) {
+        registed_table.append(Session_generat_table_row_from_record(child_record));
+    }
+
+}
+async function Registed_check_import_json(input_element)
+{
+    try
+    {
+        if (input_element.files.length)
+        {
+            json_content=await read_file_as_string(input_element.files[0])        
+            ImportedObj = JSON.parse(json_content)
+            if(ImportedObj.length)
+            {
+                const recorded_names = await get_all_recoded_children_names()
+                const new_records = ImportedObj.filter((imported_record) => !recorded_names.includes(imported_record.Name))
+                const myidb = idb.wrap(window.db)
+                tx = myidb.transaction(['children'], 'readwrite')
+                ob = tx.objectStore('children')
+
+                let adding_promises=new_records.map((new_record)=>ob.put(new_record))
+                await Promise.all([...adding_promises,tx.done])
+                M.toast({html:`found new ${adding_promises.length} , Importing db Done !!`})
+                Registed_table_refresh()
+                }
+            }
+        }
+    catch(any)
+    {
+        console.error(any)
+    }
+}
+
+async function Registed_Actions_Import()
+{
+    document.querySelector("input#json_input").click()
+}
+async function Registed_Actions_Export()
+{
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(await get_all_recoded_children()));
+    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("download", "children_db"+Date.now().toString()+".json");
+    dlAnchorElem.click();
 }
 
 function childRow_to_obj(tr)
@@ -359,7 +430,7 @@ async function Session_detect_descriptors(buffers) {
         console.log(Window.Session_detect_descriptors_result)
         const descriptors_arrs=Window.Session_detect_descriptors_result.flat()
         console.log(descriptors_arrs)
-        let all_recoded_children=await get_all_recoded_children()
+        let all_recoded_children=await get_all_recoded_discriptors()
         console.log(all_recoded_children)
         let registed_d = all_recoded_children.map(record => { return record.Discriptor })
         console.log(registed_d)
@@ -444,7 +515,7 @@ function Session_get_missing(big_array, small_array)
 async function Session_check_import_json(input_element)
 {
     try
-    {
+    { 
         if (input_element.files.length)
         {
             json_content=await read_file_as_string(input_element.files[0])        
@@ -529,7 +600,19 @@ function Session_generat_table_row_from_record(child_record) {
     let tr = document.createElement("tr")
     tr.setAttribute('class', 'child_row')
     tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
-    tr.setAttribute('ondblclick', 'console.log("dblclick action tobe implemented")')
+    // tr.setAttribute('ondblclick', 'console.log("dblclick action tobe implemented")')
+    tr.setAttribute('onmouseup', function () {
+        // Set timeout
+        pressTimer = window.setTimeout(async function () {
+            await show_child_data(this.childNodes[0].innerText)
+        }, 1000);
+        return false;
+    });
+    tr.setAttribute('onmouseup', function () {
+        clearTimeout(pressTimer);
+        // Clear timeout
+        return false;
+    })
     let td_n = document.createElement("td")
     td_n.setAttribute('class', 'child_name')
     td_n.append(document.createTextNode(child_record.Name))
@@ -547,6 +630,47 @@ function Session_generat_table_row_from_record(child_record) {
     return tr
 }
 
+async function show_child_data(child_name)
+{
+    child_data_div=document.getElementById("child_data")
+    mm=M.Modal.getInstance(child_data_div)
+    myidb=idb.wrap(window.db)
+    tx = myidb.transaction(['children'], 'readwrite')
+    ob = tx.objectStore('children')
+    await reset_child_data()
+    let child_record=await ob.get(child_name)
+    window.registration_discriptor=[child_record.Discriptor._descriptors]
+    document.querySelector("#Name").value=child_record.Name
+    document.querySelector("#Address").value=child_record.Address
+    document.querySelector("#Location").value=child_record
+    document.querySelector("#Class").value=child_record
+    document.querySelector("li.selected").classList.remove("selected")
+    document.querySelector("li.disabled").classList.add("selected")
+    document.querySelector("#telephone").value=child_record
+    document.querySelector("#birthdate").value=child_record
+// TODO: change in discriptors on update effect
+
+    mm.open()
+
+}
+
+async function reset_child_data()
+{
+    child_data_div = document.getElementById("child_data")
+    mm = M.Modal.getInstance(child_data_div)
+    window.registration_discriptor.descriptor=null
+    document.querySelector("#cam").value = ''
+    document.querySelector("#Name").value = ''
+    document.querySelector("#Address").value = ''
+    document.querySelector("#Location").value = ''
+    document.querySelector("#Class").value = '?'
+    document.querySelector("li.selected").classList.remove("selected")
+    document.querySelector("li.disabled").classList.add("selected")
+    document.querySelector("#telephone").value = ''
+    document.querySelector("#birthdate").value = ''
+
+}
+
 function Session_missing_table_update() {
     let big_arr = Session_tbody_to_array(document.querySelector("#church_table"))
     let small_arr = Session_tbody_to_array(document.querySelector("#home_table"))
@@ -561,12 +685,20 @@ function Session_missing_table_update_callback(missed_children) {
     setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row_from_record(child)))), 200)
 }
 
-async function get_all_recoded_children()
+async function get_all_recoded_children_names()
+{
+    const myidb = idb.wrap(window.db)
+    tx = myidb.transaction(['children'], 'readwrite')
+    ob = tx.objectStore('children')
+    return [...await ob.getAll()].map(record => record.Name)
+}
+
+async function get_all_recoded_discriptors()
 {
     let result_children=null
     Window.session_result_children=null
 
-    const myidb= idb.wrap(indexedDB.open())
+    const myidb= idb.wrap(window.db)
     ob=myidb.transaction(['children'],'readwrite').objectStore('children')
     let request=await ob.getAll()
     request=request.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})

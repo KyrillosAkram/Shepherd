@@ -205,13 +205,9 @@
         <!-- Dropdown Structure -->
         <ul id='dropdown1' class='dropdown-content' style="width:auto;">
             <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Session_Actions_Save()">save</i>Save</a></li>
+                        onclick="Registed_Actions_Import()">upload</i>Import</a></li>
             <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Session_Actions_Load()">settings_backup_restore</i>Load</a></li>
-            <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Session_Actions_Import()">upload</i>Import</a></li>
-            <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Session_Actions_Export()">download</i>Export</a></li>
+                        onclick="Registed_Actions_Export()">download</i>Export</a></li>
             <li><a href="#!" class="red white-text"><i class="material-icons red"
                         >close</i>Close</a></li>
         </ul>
@@ -230,10 +226,141 @@
             <tbody id="registed_table">
             </tbody>
         </table>
-
+    
         <div id="fake_div"><!--  class="hide"> -->
-            <a  id="downloadAnchorElem" class="hide" style="display:none"></a>
-            <input type="file" id="json_input" class="hide" accept=".json,application/json" onchange="Session_check_import_json(this)">
+            <a id="downloadAnchorElem" class="hide" style="display:none"></a>
+            <input type="file" id="json_input" class="hide" accept=".json,application/json"
+                onchange="Registed_check_import_json(this)">
+            <div id="child_data" class="modal">
+                <div class="modal-content">
+                    <h4>Child data</h4>
+                    <div class="container center-align">
+                        <div class="row">
+                            <div class="row">
+                                <div class="switch">
+                                    <label>
+                                        Read only
+                                        <input type="checkbox" onchange="console.log(this)">
+                                        <span class="lever"></span>
+                                        Edit
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="row">
+                                <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                                <div class="btn-floating" onclick="$('#cam').click()">
+                                    <i class="material-icons">camera_alt</i>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">person</i> -->
+                                    <input value="" id="Name" type="text" class="validate">
+                                    <label class="active" for="Name">Name</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">map</i> -->
+                                    <input value="" id="Address" type="text" class="validate">
+                                    <label class="active" for="Address">Address</label>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
+    
+                                <div class="input-field row ">
+                                    <!-- <i class="material-icons inline">school</i> -->
+                                    <select id="Class" class=" inline">
+                                        <option value="?" disabled selected>Class</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                    <!-- <label for="Class">Class</label> -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- <input id="birthdate" type="text" class="datepicker">
+                    <label for="birthdate">Birthdate</label> -->
+                                <div class="input-field">
+                                    <div class="modal datepicker-modal indigo"
+                                        id="modal-5a9af230-c376-a9ae-cf76-4ef075986a48" tabindex="0">
+                                        <div class="modal-content datepicker-container">
+                                            <div class="datepicker-date-display"><span class="year-text"></span><span
+                                                    class="date-text"></span></div>
+                                            <div class="datepicker-calendar-container">
+                                                <div class="datepicker-calendar"></div>
+                                                <div class="datepicker-footer"><button
+                                                        class="btn-flat datepicker-clear waves-effect"
+                                                        style="visibility: hidden;" type="button"></button>
+                                                    <div class="confirmation-btns"><button
+                                                            class="btn-flat datepicker-cancel waves-effect"
+                                                            type="button">Cancel</button><button
+                                                            class="btn-flat datepicker-done waves-effect"
+                                                            type="button">Ok</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <i class="material-icons prefix">cake</i> -->
+                                    <input id="birthdate" type="text" class="datepicker">
+                                    <label for="birthdate">Birthdate</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class=" input-field">
+                                    <!-- <i class="material-icons prefix">phone</i> -->
+                                    <input id="telephone" type="tel" class="validate">
+                                    <label for="telephone">Telephone</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">place</i> -->
+                                    <input value="" id="Location" type="text" class="validate">
+                                    <label class="active" for="Location">Location</label>
+                                </div>
+                                <div class="btn-floating tooltipped" data-position="bottom"
+                                    data-tooltip="fill with current location" onclick="fill_with_current_location()">
+                                    <i class="material-icons">my_location</i>
+                                </div>
+                                <!--TODO: implement map -->
+                                <div class="btn-floating tooltipped" data-position="bottom"
+                                    data-tooltip="fill with current location" onclick="fill_with_current_location()">
+                                    <i class="material-icons">map</i>
+                                </div>
+                            </div>
+    
+                            <div class="row">
+                                <button id="registeration_submit" class="btn disabled" style="border-radius: 18px; "
+                                    onclick="submit_registration()">Submit</button>
+                            </div>
+                            <div class="row" id="image_section">
+    
+                            </div>
+    
+                        </div>
+    
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- TODO: add delete -->
+
+                    <!-- TODO: Apply update -->
+
+                    <!-- TODO: marge submit and apply -->
+                    <button class="indigo white-text waves-effect waves-green btn-flat"
+                        onclick="Session_table_manual_add_btn()">Apply</button>
+                    <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
+    
+                </div>
+            </div>
         </div>
     </div>
     <script>
