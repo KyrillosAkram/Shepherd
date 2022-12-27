@@ -185,7 +185,7 @@ function submit_registration() {
                 let trx = window.db.transaction("children", "readwrite")
                 let children = trx.objectStore("children");
                 Promise.all([new faceapi.LabeledFaceDescriptors(document.querySelector("#Name").value, [window.registration_discriptor.descriptor])]).then((values) => {
-                    children.add(
+                    children.put(
                         {
                             Name:document.querySelector("#Name").value,
                             Address:document.querySelector("#Address").value,
@@ -219,6 +219,14 @@ function submit_registration() {
         M.toast({ html: "Please fill all filds !!!" })
     }
 }
+/* for simulating events like click as user click
+**  for ex.==> trigger(document.querySelector("#introduction > div > form > div > div:nth-child(5) > div > input"),'click')
+*/
+
+const trigger = (el, etype, custom) => {
+  const evt = custom ?? new Event( etype, { bubbles: true } );
+  el.dispatchEvent( evt );
+};
 
 function Session_onLoad() {
     let image, canvas;
@@ -271,7 +279,7 @@ if ('serviceWorker' in navigator) {
 /*********************************** Session ***********************************/
 function generate_direction(latitude_longitude)
 {
-    return "https://www.google.com/maps/dir//latitude_longitude/"
+    return `https://www.google.com/maps/dir//${latitude_longitude}/`
 }
 
 function Session_Actions_Save() 
@@ -600,18 +608,31 @@ function Session_generat_table_row_from_record(child_record) {
     let tr = document.createElement("tr")
     tr.setAttribute('class', 'child_row')
     tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
-    // tr.setAttribute('ondblclick', 'console.log("dblclick action tobe implemented")')
-    tr.setAttribute('onmouseup', function () {
+    tr.addEventListener('dblclick', (event)=>{
+        // console.log(`dblclick action tobe implemented ${a0},${a1},${a2}`);
+        // console.log(a0)
+            console.log(event.target)
+             show_child_data(event.target.parentElement.childNodes[0].innerText)
+    })
+    tr.addEventListener('mousedown',  (event)=> {
         // Set timeout
-        pressTimer = window.setTimeout(async function () {
-            await show_child_data(this.childNodes[0].innerText)
-        }, 1000);
-        return false;
+        console.log('mousedown')
+        // console.log(element)
+        console.log(event)
+        window.pressTimer = window.setTimeout( (element) =>{
+            console.log("tr : long press/touch detected")
+            console.log(element)
+             show_child_data(element.parentElement.childNodes[0].innerText)
+        }, 1000,event.target);
+        // return false;
     });
-    tr.setAttribute('onmouseup', function () {
-        clearTimeout(pressTimer);
+    tr.addEventListener('mouseup',  (event)=> {
+        clearTimeout(window.pressTimer);
+
+        console.log('onmouseup')
+        console.log(event)
         // Clear timeout
-        return false;
+        // return false;
     })
     let td_n = document.createElement("td")
     td_n.setAttribute('class', 'child_name')
@@ -630,6 +651,49 @@ function Session_generat_table_row_from_record(child_record) {
     return tr
 }
 
+function child_data_disable_inputs()
+{
+document.querySelector("#cam").nextElementSibling.classList.add("disabled")//.classList.add("disabled")
+document.querySelector("#Name").setAttribute("disabled",'')
+document.querySelector("#Address").setAttribute("disabled",'')
+document.querySelector("#Location").setAttribute("disabled",'')
+document.querySelector("#Class").parentNode.getElementsByTagName('input')[0].setAttribute('disabled','')
+document.querySelector("#telephone").setAttribute("disabled",'')
+document.querySelector("#birthdate").setAttribute("disabled",'')
+document.querySelector("#location_getter_btn").classList.add("disabled")
+document.querySelector("#child_data_delete_btn").classList.add("disabled")
+document.querySelector("#child_data_update_btn").classList.add("disabled")
+// switch_element.checked=true
+}
+function child_data_enable_inputs()
+{
+document.querySelector("#cam").nextElementSibling.classList.remove("disabled")
+// document.querySelector("#cam").classList.remove("disabled")
+document.querySelector("#Name").removeAttribute("disabled")
+document.querySelector("#Address").removeAttribute("disabled")
+document.querySelector("#Location").removeAttribute("disabled")
+document.querySelector("#Class").parentNode.getElementsByTagName('input')[0].removeAttribute("disabled")
+document.querySelector("#telephone").removeAttribute("disabled")
+document.querySelector("#birthdate").removeAttribute("disabled")
+document.querySelector("#location_getter_btn").classList.remove("disabled")
+document.querySelector("#child_data_delete_btn").classList.remove("disabled")
+document.querySelector("#child_data_update_btn").classList.remove("disabled")
+
+// switch_element.checked=false
+}
+function child_data_toggle(switch_element)
+{
+    if(switch_element.checked)
+    {// Edit mode
+        console.log("Edit mode")
+        child_data_enable_inputs()
+    }
+    else
+    {// Read only mode
+        console.log("Read only mode")
+        child_data_disable_inputs()
+    }
+}
 async function show_child_data(child_name)
 {
     child_data_div=document.getElementById("child_data")
@@ -639,16 +703,39 @@ async function show_child_data(child_name)
     ob = tx.objectStore('children')
     await reset_child_data()
     let child_record=await ob.get(child_name)
-    window.registration_discriptor=[child_record.Discriptor._descriptors]
-    document.querySelector("#Name").value=child_record.Name
-    document.querySelector("#Address").value=child_record.Address
-    document.querySelector("#Location").value=child_record
-    document.querySelector("#Class").value=child_record
-    document.querySelector("li.selected").classList.remove("selected")
-    document.querySelector("li.disabled").classList.add("selected")
-    document.querySelector("#telephone").value=child_record
-    document.querySelector("#birthdate").value=child_record
-// TODO: change in discriptors on update effect
+    window.displayed_child_record=child_record
+    // window.registration_discriptor={descriptor:child_record.Discriptor._descriptors}
+
+    // ip = [
+    //     document.querySelector("#Name"),
+    //     document.querySelector("#Address"),
+    //     document.querySelector("#Location"),
+    //     document.querySelector("#Class"),
+    //     document.querySelector("#telephone"),
+    //     document.querySelector("#birthdate"),
+    // ]
+
+
+
+
+
+
+
+    document.querySelector("#Name").value = child_record.Name
+    document.querySelector("#Address").value = child_record.Address
+    document.querySelector("#Location").value=child_record.Location
+    document.querySelector("#Class").parentElement.getElementsByTagName('input')[0].value=child_record.Class
+    // trigger(document.querySelector("#Class"),'click')
+        // document.querySelector("li.selected").classList.remove("selected")
+    // document.querySelector("li.disabled").classList.add("selected")
+    document.querySelector("#telephone").value=child_record.Telephone
+    document.querySelector("#birthdate").value=child_record.Birthdate
+    for (el of [...document.querySelectorAll("label")])
+    {
+        el.classList.add('active')
+    }
+    child_data_disable_inputs()
+    document.querySelector("#readOnly_edit_switch").checked=false
 
     mm.open()
 
@@ -658,7 +745,7 @@ async function reset_child_data()
 {
     child_data_div = document.getElementById("child_data")
     mm = M.Modal.getInstance(child_data_div)
-    window.registration_discriptor.descriptor=null
+    window.registration_discriptor=null
     document.querySelector("#cam").value = ''
     document.querySelector("#Name").value = ''
     document.querySelector("#Address").value = ''
@@ -668,6 +755,40 @@ async function reset_child_data()
     document.querySelector("li.disabled").classList.add("selected")
     document.querySelector("#telephone").value = ''
     document.querySelector("#birthdate").value = ''
+
+}
+async function child_data_update()
+{
+    const myidb= idb.wrap(await open_db("sefain_brain"))
+    tx=myidb.transaction(['children'],'readwrite')
+    ob=tx.objectStore('children')
+    window.displayed_child_record.Name      = document.querySelector("#Name").value
+    window.displayed_child_record.Address   = document.querySelector("#Address").value
+    window.displayed_child_record.Location  = document.querySelector("#Location").value
+    window.displayed_child_record.Class     = document.querySelector("#Class").value
+    window.displayed_child_record.telephone = document.querySelector("#telephone").value
+    window.displayed_child_record.birthdate = document.querySelector("#birthdate").value
+    if(window.registration_discriptor )
+    {
+       window.displayed_child_record.Discriptor=await new faceapi.LabeledFaceDescriptors(window.displayed_child_record.Name, [window.registration_discriptor.descriptor])
+    }
+    // wait updating to be finished
+    await ob.put(window.displayed_child_record)
+    await tx.done
+    // refresh the page
+    location.reload()
+}
+
+async function child_data_remove()
+{
+    const myidb= idb.wrap(await open_db("sefain_brain"))
+    tx=myidb.transaction(['children'],'readwrite')
+    ob=tx.objectStore('children')
+    // wait updating to be finished
+    await ob.delete(window.displayed_child_record.Name)
+    await tx.done
+    // refresh the page
+    location.reload()
 
 }
 
@@ -705,6 +826,16 @@ async function get_all_recoded_discriptors()
     return request
 }
 
+function check_direction_on_map()
+{
+    // document.querySelector("#Location").value
+    ml=document.querySelector("#map_link")
+    ml.setAttribute("href",
+        generate_direction(document.querySelector("#Location").value)
+    )
+    // trigger(ml,'click')
+    ml.click()
+}
 
 function Session_get_children(children_array, callback) {
     let result_children = [];
@@ -797,12 +928,12 @@ $("nav").addClass(primer_color_theme)
 Window.Collapsible_instances = M.Collapsible.init(document.querySelectorAll('.collapsible'));
 Window.Modal_instances = M.Modal.init(document.querySelectorAll('.modal'));
 Window.autoComplete_instances = M.Autocomplete.init(document.querySelectorAll('.autocomplete', { data: {} }));
+Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
+setTimeout(()=>{Window.Birthdate_instances = M.Datepicker.init(document.querySelectorAll('.datepicker'),{format:"dd-mm-yyyy"});},1000)
+M.AutoInit();
 Window.FAB_instances = M.FloatingActionButton.init(document.querySelectorAll('.fixed-action-btn'), {
     direction: 'up',
     hoverEnabled: false
 });
-Window.instance = new M.Sidenav(document.querySelector('.sidenav'));
-setTimeout(()=>{Window.Birthdate_instances = M.Datepicker.init(document.querySelectorAll('.datepicker'),{format:"dd-mm-yyyy"});},1000)
-M.AutoInit();
 
 /********************************************************************************/

@@ -46,11 +46,54 @@
             }
         }
 
-        /* .container{
-            align-items: center;
-            justify-content: center;
-            display: flex;
-        } */
+        .datepicker-cancel,
+        .datepicker-clear,
+        .datepicker-today,
+        .datepicker-done.btn-flat.datepicker-done.waves-effect {
+            color: #5c6bc0;
+        }
+
+        .datepicker-date-display {
+            background-color: #5c6bc0;/*indigo lighten-1*/
+            color: #fff;
+        }
+
+        .datepicker-day-button {
+            background-color: transparent;
+            border: none;
+            line-height: 38px;
+            display: block;
+            width: 100%;
+            border-radius: 50%;
+            padding: 0 5px;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        td.is_selected {
+            background-color: #5c6bc0;
+        }
+
+        .datepicker-table td.is-selected {
+            background-color: #5c6bc0;
+            color: #fff;
+        }
+
+        .datepicker-table td.is-today {
+            color: #5c6bc0;
+        }
+
+        .select-wrapper input.select-dropdown {
+            color: #9e9e9e;
+        }
+        .dropdown-content li>a, .dropdown-content li>span {
+            font-size: 16px;
+            color: #5c6bc0;
+            display: block;
+            line-height: 22px;
+            padding: 14px 16px;
+        }
+
     </style>
 </head>
 
@@ -154,10 +197,10 @@
                 </div>
             </div>
         </div> -->
-        <div class="red btn-floating session_table_action_btn disabled table_body_row_action"
+        <!-- <div class="red btn-floating session_table_action_btn disabled table_body_row_action"
             onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0">
             <i class="material-icons">group_remove</i>
-        </div>
+        </div> -->
         <!-- <input id="cam" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
         <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam').click();document.querySelector('div#loading_circle').classList.add('active')">
             <i class="material-icons">add_a_photo</i>
@@ -196,21 +239,22 @@
                 <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
             </div>
         </div> -->
-
+<div class="fixed-action-btn  " style="bottom: 45px; right: 24px;">
         <!-- Dropdown Trigger -->
-        <a class=' dropdown-trigger btn-floating ' href='#' data-target='dropdown1'>
-            <i class="material-icons right">more_horiz</i>
+        <a class='btn-large  btn-floating ' href='#' >
+            <i class="material-icons right">more_vert</i>
         </a>
 
         <!-- Dropdown Structure -->
-        <ul id='dropdown1' class='dropdown-content' style="width:auto;">
-            <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Registed_Actions_Import()">upload</i>Import</a></li>
-            <li><a href="#!" class="indigo-text"><i class="material-icons "
-                        onclick="Registed_Actions_Export()">download</i>Export</a></li>
-            <li><a href="#!" class="red white-text"><i class="material-icons red"
+        <ul  >
+            <li><a href="#!" class="red white-text btn-floating"><i class="material-icons red"
                         >close</i>Close</a></li>
+            <li><a href="#!" class="white-text btn-floating"><i class="material-icons "
+                        onclick="Registed_Actions_Import()">upload</i>Import</a></li>
+            <li><a href="#!" class="white-text btn-floating"><i class="material-icons "
+                        onclick="Registed_Actions_Export()">download</i>Export</a></li>
         </ul>
+</div>
 
     </div>
     <div class="container center-align" id="main_content">
@@ -228,6 +272,7 @@
         </table>
     
         <div id="fake_div"><!--  class="hide"> -->
+            <a href="" id="map_link" class="hide" target="_blank"></a>
             <a id="downloadAnchorElem" class="hide" style="display:none"></a>
             <input type="file" id="json_input" class="hide" accept=".json,application/json"
                 onchange="Registed_check_import_json(this)">
@@ -237,10 +282,10 @@
                     <div class="container center-align">
                         <div class="row">
                             <div class="row">
-                                <div class="switch">
+                                <div class="switch" >
                                     <label>
                                         Read only
-                                        <input type="checkbox" onchange="console.log(this)">
+                                        <input id="readOnly_edit_switch" type="checkbox" onchange="child_data_toggle(this)">
                                         <span class="lever"></span>
                                         Edit
                                     </label>
@@ -271,7 +316,7 @@
     
                                 <div class="input-field row ">
                                     <!-- <i class="material-icons inline">school</i> -->
-                                    <select id="Class" class=" inline">
+                                    <select id="Class" >
                                         <option value="?" disabled selected>Class</option>
                                         <option value="0">0</option>
                                         <option value="1">1</option>
@@ -326,38 +371,37 @@
                                     <input value="" id="Location" type="text" class="validate">
                                     <label class="active" for="Location">Location</label>
                                 </div>
-                                <div class="btn-floating tooltipped" data-position="bottom"
+                                <div id="location_getter_btn" class="btn-floating tooltipped" data-position="bottom"
                                     data-tooltip="fill with current location" onclick="fill_with_current_location()">
                                     <i class="material-icons">my_location</i>
                                 </div>
                                 <!--TODO: implement map -->
                                 <div class="btn-floating tooltipped" data-position="bottom"
-                                    data-tooltip="fill with current location" onclick="fill_with_current_location()">
+                                    data-tooltip="check the direction on map" onclick="check_direction_on_map()">
                                     <i class="material-icons">map</i>
                                 </div>
                             </div>
-    
-                            <div class="row">
-                                <button id="registeration_submit" class="btn disabled" style="border-radius: 18px; "
-                                    onclick="submit_registration()">Submit</button>
-                            </div>
+                            
+                            <!-- <div class="row">
+                            </div> -->
                             <div class="row" id="image_section">
-    
+                                
                             </div>
-    
+
+                            <!-- DON'T REMOVE OR COMMENT NEXT LINE  -->
+                            <button id="registeration_submit" class="btn disabled hide" style="border-radius: 18px; " onclick="submit_registration()">Submit</button>
+                            
                         </div>
-    
+                        
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <!-- TODO: add delete -->
+                <div class="modal-footer center-align">
 
-                    <!-- TODO: Apply update -->
-
-                    <!-- TODO: marge submit and apply -->
-                    <button class="indigo white-text waves-effect waves-green btn-flat"
-                        onclick="Session_table_manual_add_btn()">Apply</button>
-                    <button class="modal-close red white-text waves-effect waves-green btn-flat ">Close</button>
+                    <button id="child_data_delete_btn" class="red white-text waves-effect waves-green btn-flat"
+                        onclick="child_data_remove()">Delete</button>
+                    <button id="child_data_update_btn" class="yellow white-text waves-effect waves-green btn-flat"
+                        onclick="child_data_update()">Update</button>
+                    <button class="modal-close green lighten-2 white-text waves-effect waves-green btn-flat ">Close</button>
     
                 </div>
             </div>
