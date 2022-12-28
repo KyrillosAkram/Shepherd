@@ -822,8 +822,17 @@ async function get_all_recoded_discriptors()
     const myidb= idb.wrap(window.db)
     ob=myidb.transaction(['children'],'readwrite').objectStore('children')
     let request=await ob.getAll()
-    request=request.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,record.Discriptor._descriptors)}})
+    request=request.map(record=>{return{...record,Discriptor:new faceapi.LabeledFaceDescriptors(record.Discriptor._label,[new Float32Array(Discriptor_parser(record.Discriptor._descriptors[0]))])}})
     return request
+}
+
+function Discriptor_parser(Discriptor)
+{
+ let a=[]
+for (i in Discriptor){
+    a.push(Discriptor[i])
+}//if(typeof(Discriptor)!=)
+return a   
 }
 
 function check_direction_on_map()

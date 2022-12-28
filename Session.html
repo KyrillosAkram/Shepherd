@@ -158,8 +158,8 @@
             onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0">
             <i class="material-icons">group_remove</i>
         </div>
-        <input id="cam" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
-        <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam').click();document.querySelector('div#loading_circle').classList.add('active')">
+        <input id="cam_session" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
+        <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam_session').click();document.querySelector('div#loading_circle').classList.add('active')">
             <i class="material-icons">add_a_photo</i>
         </div>
         
@@ -225,49 +225,38 @@
                 <li id="li_church" class="collapsible_li_table">
                     <div class="collapsible-header"><i class="material-icons">church</i>Going to church</div>
                     <div class="collapsible-body container">
-                        <div class="row container right-align">
-                            <div class="row left-align">
-    
-    
-                                <table class="striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Class</th>
-                                            <th>Address</th>
-                                        </tr>
-                                    </thead>
-    
-                                    <tbody id="church_table">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <table class="striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                    <th>Address</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="church_table">
+                            </tbody>
+                        </table>
+                        
                     </div>
                 </li>
                 <li id="li_home" class="collapsible_li_table">
                     <div class="collapsible-header"><i class="material-icons">home</i>Returning to home</div>
                     <div class="collapsible-body">
-                        <div class="row container right-align">
-                            <div class="row left-align">
+                        <table class="striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                    <th>Address</th>
+                                </tr>
+                            </thead>
 
+                            <tbody id="home_table">
 
-                                <table class="striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Class</th>
-                                            <th>Address</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody id="home_table">
-
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
+                            </tbody>
+                        </table>
+                        
                     </div>
                 </li>
                 <li>
@@ -292,8 +281,139 @@
             </ul>
         </div>
         <div id="fake_div"><!--  class="hide"> -->
-            <a  id="downloadAnchorElem" class="hide" style="display:none"></a>
-            <input type="file" id="json_input" class="hide" accept=".json,application/json" onchange="Session_check_import_json(this)">
+            <a href="" id="map_link" class="hide" target="_blank"></a>
+            <a id="downloadAnchorElem" class="hide" style="display:none"></a>
+            <input type="file" id="json_input" class="hide" accept=".json,application/json"
+                onchange="Session_check_import_json(this)">
+            <div id="child_data" class="modal">
+                <div class="modal-content">
+                    <h4>Child data</h4>
+                    <div class="container center-align">
+                        <div class="row">
+                            <div class="row">
+                                <div class="switch" >
+                                    <label>
+                                        Read only
+                                        <input id="readOnly_edit_switch" type="checkbox" onchange="child_data_toggle(this)">
+                                        <span class="lever"></span>
+                                        Edit
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="row">
+                                <input id="cam" type="file" accept="image/*;capture=camera" class="hide">
+                                <div class="btn-floating" onclick="$('#cam').click()">
+                                    <i class="material-icons">camera_alt</i>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">person</i> -->
+                                    <input value="" id="Name" type="text" class="validate">
+                                    <label class="active" for="Name">Name</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">map</i> -->
+                                    <input value="" id="Address" type="text" class="validate">
+                                    <label class="active" for="Address">Address</label>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <!-- <p  class="left grey-text text-lighten-1 validate">Class</p> -->
+    
+                                <div class="input-field row ">
+                                    <!-- <i class="material-icons inline">school</i> -->
+                                    <select id="Class" >
+                                        <option value="?" disabled selected>Class</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                    <!-- <label for="Class">Class</label> -->
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- <input id="birthdate" type="text" class="datepicker">
+                    <label for="birthdate">Birthdate</label> -->
+                                <div class="input-field">
+                                    <div class="modal datepicker-modal indigo"
+                                        id="modal-5a9af230-c376-a9ae-cf76-4ef075986a48" tabindex="0">
+                                        <div class="modal-content datepicker-container">
+                                            <div class="datepicker-date-display"><span class="year-text"></span><span
+                                                    class="date-text"></span></div>
+                                            <div class="datepicker-calendar-container">
+                                                <div class="datepicker-calendar"></div>
+                                                <div class="datepicker-footer"><button
+                                                        class="btn-flat datepicker-clear waves-effect"
+                                                        style="visibility: hidden;" type="button"></button>
+                                                    <div class="confirmation-btns"><button
+                                                            class="btn-flat datepicker-cancel waves-effect"
+                                                            type="button">Cancel</button><button
+                                                            class="btn-flat datepicker-done waves-effect"
+                                                            type="button">Ok</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <i class="material-icons prefix">cake</i> -->
+                                    <input id="birthdate" type="text" class="datepicker">
+                                    <label for="birthdate">Birthdate</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class=" input-field">
+                                    <!-- <i class="material-icons prefix">phone</i> -->
+                                    <input id="telephone" type="tel" class="validate">
+                                    <label for="telephone">Telephone</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field">
+                                    <!-- <i class="material-icons prefix">place</i> -->
+                                    <input value="" id="Location" type="text" class="validate">
+                                    <label class="active" for="Location">Location</label>
+                                </div>
+                                <div id="location_getter_btn" class="btn-floating tooltipped" data-position="bottom"
+                                    data-tooltip="fill with current location" onclick="fill_with_current_location()">
+                                    <i class="material-icons">my_location</i>
+                                </div>
+                                <div class="btn-floating tooltipped" data-position="bottom"
+                                    data-tooltip="check the direction on map" onclick="check_direction_on_map()">
+                                    <i class="material-icons">map</i>
+                                </div>
+                            </div>
+                            
+                            <!-- <div class="row">
+                            </div> -->
+                            <div class="row" id="image_section">
+                                
+                            </div>
+
+                            <!-- DON'T REMOVE OR COMMENT NEXT LINE  -->
+                            <button id="registeration_submit" class="btn disabled hide" style="border-radius: 18px; " onclick="submit_registration()">Submit</button>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer center-align">
+
+                    <button id="child_data_delete_btn" class="red white-text waves-effect waves-green btn-flat"
+                        onclick="child_data_remove()">Delete</button>
+                    <button id="child_data_update_btn" class="yellow white-text waves-effect waves-green btn-flat"
+                        onclick="child_data_update()">Update</button>
+                    <button class="modal-close green lighten-2 white-text waves-effect waves-green btn-flat ">Close</button>
+    
+                </div>
+            </div>
+
         </div>
     </div>
     <script>
