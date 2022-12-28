@@ -45,7 +45,15 @@
                 padding-left: 0;
             }
         }
+nav {
+    color: #fff;
+    background-color: #3f51b5 !important;
+    }
 
+    .btn-floating {
+    color: #fff;
+    background-color: #3f51b5 !important;
+}
         /* .container{
             align-items: center;
             justify-content: center;
@@ -155,10 +163,15 @@
             </div>
         </div>
         <div class="red btn-floating session_table_action_btn disabled table_body_row_action"
-            onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0">
+            onclick="[...document.querySelectorAll('tr.grey')].map(tr => tr.parentElement.removeChild(tr));this.classList.add('disabled');Window.session_row_selection=0;setTimeout(()=>{
+        tbodys=document.querySelectorAll('tbody')
+        document.querySelector('span#Going').innerText=tbodys[0].getElementsByTagName('tr').length
+        document.querySelector('span#Returning').innerText=tbodys[1].getElementsByTagName('tr').length
+        document.querySelector('span#Missing').innerText='?'
+},500)">
             <i class="material-icons">group_remove</i>
         </div>
-        <input id="cam_session" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="M.toast({html:'on change'});Session_check_input_add(this)">
+        <input id="cam_session" type="file" multiple accept="image/*;capture=camera" class="hide" onchange="Session_check_input_add(this)">
         <div class="btn-floating session_table_action_btn  disabled" onclick="$('#cam_session').click();document.querySelector('div#loading_circle').classList.add('active')">
             <i class="material-icons">add_a_photo</i>
         </div>
@@ -279,6 +292,9 @@
                     </div>
                 </li>
             </ul>
+        </div>
+        <div class="row">
+            <p>[ Going: <span id="Going">0</span> | Returning: <span id="Returning">0</span> | Missing: <span id="Missing">0</span> ]</p>
         </div>
         <div id="fake_div"><!--  class="hide"> -->
             <a href="" id="map_link" class="hide" target="_blank"></a>

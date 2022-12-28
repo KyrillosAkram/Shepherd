@@ -447,6 +447,12 @@ async function Session_detect_descriptors(buffers) {
         found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
         console.log(found_children) //.map(child_data => child_data.toString()))
         Session_active_table_add_children(found_children.map(child=>child._label))
+setTimeout(()=>{
+        tbodys=document.querySelectorAll('tbody')
+        document.querySelector("span#Going").innerText=tbodys[0].getElementsByTagName("tr").length
+        document.querySelector("span#Returning").innerText=tbodys[1].getElementsByTagName("tr").length
+        document.querySelector("span#Missing").innerText='?'
+},500)
         }
     catch (error)
     {
@@ -479,6 +485,12 @@ function Session_table_add_btns_state_updater(element) {
         else {
             session_table_action_btns.map(btn => btn.classList.add('disabled'))
         }
+        // setTimeout(()=>{
+        tbodys=document.querySelectorAll('tbody')
+        document.querySelector("span#Going").innerText=tbodys[0].getElementsByTagName("tr").length
+        document.querySelector("span#Returning").innerText=tbodys[1].getElementsByTagName("tr").length
+        document.querySelector("span#Missing").innerText='?'
+// },500)
     }, 200)
 }
 
@@ -804,6 +816,7 @@ function Session_missing_table_update_callback(missed_children) {
     let tbody = document.getElementById("missing_table")
     tbody.innerHTML = ''
     setTimeout(() => console.log(missed_children.map(child => tbody.append(Session_generat_table_row_from_record(child)))), 200)
+    setTimeout(() =>document.querySelector("span#Missing").innerText=missed_children.length.toString(),500)
 }
 
 async function get_all_recoded_children_names()
@@ -882,6 +895,13 @@ function Session_table_manual_add_btn() {
     let request = window.db.transaction(["children"], "readwrite").objectStore("children").get(document.querySelector("#autocomplete-input-search-manual-add").value)
     request.onsuccess = () => {
         tbody.appendChild(Session_generat_table_row_from_record(request.result))
+
+setTimeout(()=>{
+        tbodys=document.querySelectorAll('tbody')
+        document.querySelector("span#Going").innerText=tbodys[0].getElementsByTagName("tr").length
+        document.querySelector("span#Returning").innerText=tbodys[1].getElementsByTagName("tr").length
+        document.querySelector("span#Missing").innerText='?'
+},500)
     }
 }
 
