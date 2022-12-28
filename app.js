@@ -1,3 +1,4 @@
+window.touchtime =0
 var debugging = true;
 var l = console.log
 var current_page = "Home"
@@ -619,33 +620,53 @@ function Session_generat_table_row_from_childObj(childObj)
 function Session_generat_table_row_from_record(child_record) {
     let tr = document.createElement("tr")
     tr.setAttribute('class', 'child_row')
-    tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
-    tr.addEventListener('dblclick', (event)=>{
-        // console.log(`dblclick action tobe implemented ${a0},${a1},${a2}`);
-        // console.log(a0)
-            console.log(event.target)
-             show_child_data(event.target.parentElement.childNodes[0].innerText)
+    // tr.setAttribute('onclick', 'Session_row_selection_toggle(this)')
+    tr.addEventListener('click',(event)=>
+    {
+        // console.log(event)
+        if (touchtime == 0) {
+        // set first click
+        Session_row_selection_toggle(event.target.parentElement)
+        touchtime = new Date().getTime();
+    } else {
+        // compare first click to this click and see if they occurred within double click threshold
+        if (((new Date().getTime()) - touchtime) < 800) {
+            // double click occurred
+            console.log("double clicked");
+            show_child_data(event.target.parentElement.childNodes[0].innerText)
+            touchtime = 0;
+        } else {
+            // not a double click so set as a new first click
+            touchtime = new Date().getTime();
+        }
+    }
     })
-    tr.addEventListener('mousedown',  (event)=> {
-        // Set timeout
-        console.log('mousedown')
-        // console.log(element)
-        console.log(event)
-        window.pressTimer = window.setTimeout( (element) =>{
-            console.log("tr : long press/touch detected")
-            console.log(element)
-             show_child_data(element.parentElement.childNodes[0].innerText)
-        }, 1000,event.target);
-        // return false;
-    });
-    tr.addEventListener('mouseup',  (event)=> {
-        clearTimeout(window.pressTimer);
+    // tr.addEventListener('dblclick', (event)=>{
+    //     // console.log(`dblclick action tobe implemented ${a0},${a1},${a2}`);
+    //     // console.log(a0)
+    //         console.log(event.target)
+    //          show_child_data(event.target.parentElement.childNodes[0].innerText)
+    // })
+    // tr.addEventListener('mousedown',  (event)=> {
+    //     // Set timeout
+    //     console.log('mousedown')
+    //     // console.log(element)
+    //     console.log(event)
+    //     window.pressTimer = window.setTimeout( (element) =>{
+    //         console.log("tr : long press/touch detected")
+    //         console.log(element)
+    //          show_child_data(element.parentElement.childNodes[0].innerText)
+    //     }, 1000,event.target);
+    //     // return false;
+    // });
+    // tr.addEventListener('mouseup',  (event)=> {
+    //     clearTimeout(window.pressTimer);
 
-        console.log('onmouseup')
-        console.log(event)
-        // Clear timeout
-        // return false;
-    })
+    //     console.log('onmouseup')
+    //     console.log(event)
+    //     // Clear timeout
+    //     // return false;
+    // })
     let td_n = document.createElement("td")
     td_n.setAttribute('class', 'child_name')
     td_n.append(document.createTextNode(child_record.Name))
@@ -852,11 +873,11 @@ function check_direction_on_map()
 {
     // document.querySelector("#Location").value
     ml=document.querySelector("#map_link")
-    ml.setAttribute("href",
-        generate_direction(document.querySelector("#Location").value)
-    )
+    direction=generate_direction(document.querySelector("#Location").value)
+    ml.setAttribute("href",direction)
     // trigger(ml,'click')
-    ml.click()
+    // ml.click()
+    window.open(direction)
 }
 
 function Session_get_children(children_array, callback) {
