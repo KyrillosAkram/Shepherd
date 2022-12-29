@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return send_file('index.html')
+    # return send_file('index.html') # until development start in index.html
+    return send_file('Session.html')
 
 @app.route("/<filename>",methods=['GET'])
 def getfile(filename):
