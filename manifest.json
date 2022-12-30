@@ -3,11 +3,12 @@
   "name": "Shepherd",
   "short_name": "Shepherd",
   "start_url": "/Session.html",
+  
   "display": "standalone",
   "background_color": "#fff",
-  "description": "A pwa material desigen calculator app.",
+  "description": "app aims to help the kids guiders to improve their abilities of watching , tracking and monitoring each kid to make sure from kids safety",
   
-  "theme_color": "  ",
+  "theme_color": "#3f51b5",
   "orientation": "portrait-primary",
   "icons": [
     {

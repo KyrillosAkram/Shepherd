@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="indigo">
+    <meta name="theme-color" content="#3f51b5">
     <!--Import Google Icon Font             -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Compiled and minified CSS          -->
@@ -15,7 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
     <link rel="manifest" href="manifest.json">
-    <script defer src="face-api.min.js"></script>
+    <script  src="face-api.min.js"></script>
     <title>Document</title>
     <style>
         .row .col {
@@ -215,7 +215,11 @@
 
         <!-- Dropdown Structure -->
         <ul id='dropdown1' class='dropdown-content' style="width:auto;">
-            <li><a href="#!" class="indigo-text"><i class="material-icons "
+              <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_Start()">play_arrow</i>Start</a></li>
+           <li><a href="#!" class="indigo-text"><i class="material-icons "
+                        onclick="Session_Actions_End()">stop</i>End</a></li>
+           <li><a href="#!" class="indigo-text"><i class="material-icons "
                         onclick="Session_Actions_Save()">save</i>Save</a></li>
             <li><a href="#!" class="indigo-text"><i class="material-icons "
                         onclick="Session_Actions_Load()">settings_backup_restore</i>Load</a></li>

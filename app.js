@@ -1,3 +1,14 @@
+async function regist_sw() {
+    // register ws //
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registed_obj) => console.log("sw registed ", registed_obj))
+            .catch((error_obj) => console.log("sw not registed ", error_obj))
+    }
+}
+
+
+window.app_assets_loaded=false
 window.touchtime =0
 var debugging = true;
 var l = console.log
@@ -10,6 +21,7 @@ var pages = {
     New_session: { page_content: {} },
     Setting: { page_content: {} }
 }
+
 var registration_discriptor = [];
 async function App_onStartUp() {
     // TODO : run loadup codevar db;
@@ -236,7 +248,17 @@ function Session_onLoad() {
         faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
         faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
-    ]).then(() => { document.querySelector("div#loading_circle").classList.remove('active'); M.toast({ html: 'you can choose image' }) })
+    ]).then(() => { 
+        window.app_assets_loaded=true;
+        regist_sw()
+        // navigator.serviceWorker.controller.postMessage({
+        //     type: 'app_assets_loaded',
+        // });
+    const broadcast = new BroadcastChannel('app_assets_loaded');
+broadcast.postMessage({
+  type: 'app_assets_loaded',
+});
+        document.querySelector("div#loading_circle").classList.remove('active'); M.toast({ html: 'you can choose image' }) })
 }
 
 function Registeration_onLoad() {
@@ -248,6 +270,8 @@ function Registeration_onLoad() {
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
         faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
     ]).then(() => { // action event binder for registeration
+        
+        regist_sw()
         const cam = document.getElementById('cam');
         M.toast({ html: 'you can choose image' })
         // var registration_discriptor = [];
@@ -270,19 +294,45 @@ function Registeration_onLoad() {
     })
 }
 
-// register ws //
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-        .then((registed_obj) => console.log("sw registed ", registed_obj))
-        .catch((error_obj) => console.log("sw not registed ", error_obj))
-}
-
 /*********************************** Session ***********************************/
 function generate_direction(latitude_longitude)
 {
     return `https://www.google.com/maps/dir//${latitude_longitude}/`
 }
 
+function Session_Actions_Start()
+{
+    if(Boolean(localStorage.getItem("session_running"))&Boolean(localStorage.getItem("last_session")))
+    {
+        if(confirm("found last session saved with running state, Do you want to resume last session ?"))
+        {
+            Session_Actions_Load();
+            window.session_running=setInterval(Session_Actions_Save,1000);
+            M.toast({html:"last session resumed"})
+        }
+        else
+        {
+            localStorage.setItem("session_running",true)
+            localStorage.removeItem("last_session")
+            window.session_running=setInterval(Session_Actions_Save,1000);
+        }
+    }
+    else
+    {
+        localStorage.setItem("session_running",true)
+        localStorage.removeItem("last_session")
+        window.session_running=setInterval(Session_Actions_Save,1000);
+    }
+
+}
+function Session_Actions_End()
+{
+    localStorage.removeItem("session_running")
+    localStorage.removeItem("last_session")
+    clearInterval(window.session_running);
+    window.session_running=undefined
+
+}
 function Session_Actions_Save() 
 {
     localStorage.setItem("last_session",JSON.stringify(Session_tables_to_obj()))
