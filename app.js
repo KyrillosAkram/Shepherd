@@ -10,6 +10,9 @@ async function regist_sw() {
 
 window.app_assets_loaded=false
 window.touchtime =0
+setInterval(() => {
+    window.touchtime =0
+}, 500);
 var debugging = true;
 var l = console.log
 var current_page = "Home"
