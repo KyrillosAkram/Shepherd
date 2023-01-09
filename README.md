@@ -11,7 +11,7 @@ this a progressive web app aims to help the kids guiders to improve their abilit
   5. ✅ Import Session from json
   6. 🔜 Synchronization Session ( multiple persons can work together )
   7. 🔜 Session status ( collecting, to church , in church , to home , reached home ,finished )
-  8. 🔜 Backup the database
+  8. ✅ Backup the database
   9. ✅ View and Edit the database
   10. 🔜 Session Contributors
   11. 🔜 Setting of app
