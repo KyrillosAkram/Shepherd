@@ -1,0 +1,120 @@
+@startuml
+Title Broker Server rule
+client -> server: get file
+activate server
+server --> client : return file,200
+deactivate server
+
+session_admin ->server :regist session info
+activate server
+server --> session_admin : session id "could be name"
+deactivate server
+
+session_admin -> server : post task
+activate server
+server --> session_admin : 404  "reject task no volantier"
+deactivate server
+
+volantier_1 -> server : regist_request
+activate server
+server --> volantier_1 : id,200
+deactivate server
+
+volantier_1 -> server : periodic get task 
+activate server
+server --> volantier_1 : tasks>0? atask : null;=> null
+deactivate server
+
+client_1 ->server : get sessions
+activate server
+server --> client_1 : return public sessions
+deactivate server
+
+volantier_1 -> server : periodic get task 
+activate server
+server --> volantier_1 :  null
+deactivate server
+
+client_1 -> server : post session_id join request
+activate server
+server --> client_1 : respose 201
+deactivate server
+
+client_1 -> server : post task01
+activate server
+server --> client_1 : 201,in queue
+deactivate server
+
+volantier_1 -> server : periodic get task 
+activate server
+server --> volantier_1 :  task_01
+deactivate server
+activate volantier_1
+volantier_1 -> server : post task_01 state in progress
+activate server
+server --> volantier_1 : 201 "updated"
+deactivate server
+
+client_2 -> server : post task_02
+activate server
+server --> client_2 : 203 "in queue"
+deactivate server
+
+client_1 -> server : get task_01
+activate server
+server --> client_1: response state in progress
+deactivate server
+
+volantier_1 -> server: post task_01 result and get next
+deactivate volantier_1
+activate server
+server --> volantier_1: 201 "updated",task_02
+deactivate server
+activate volantier_1
+client_2 -> server : get task_02
+activate server
+server --> client_2: response state in progress
+deactivate server
+
+volantier_1 -> server :  post task_02 result and get next
+deactivate volantier_1
+activate server
+server --> volantier_1 : 201,idle_task or null_task
+deactivate server
+
+client_3 -> server : post task_03 
+activate server
+server --> client_3 : 201,in queue
+deactivate server
+
+volantier_1 -> server: get task
+activate server
+server --> volantier_1 : 200,task_03
+deactivate server
+activate volantier_1
+|||
+client_3 -> server: get task_03 result
+activate server
+server --> client_3: response state in progress
+deactivate server
+|||
+volantier_1 -> volantier_1 :(crash/electricity out)=>miss periodic
+deactivate volantier_1
+|||
+client_3 -> server: get task_03 result
+activate server
+server -> server: another? move task_03 to another emergency : fail; => fail, pop volantier_1 
+server --> client_3: response state timeout and no
+deactivate server
+
+volantier_1 -> server : any request
+activate server
+server --> volantier_1 : reject,unknown volan
+deactivate server
+
+volantier_1 -> server : regist_request
+activate server
+server --> volantier_1 : id,200
+deactivate server
+
+@enduml
