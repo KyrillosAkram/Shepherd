@@ -1,4 +1,9 @@
-
+/** service worker registing function
+ * @async 
+ * @function
+ * 
+ *
+ */
 async function regist_sw() {
     // register ws //
     if ('serviceWorker' in navigator) {
@@ -801,6 +806,11 @@ function refresh_all_registed_childrens() {
     debugging & console.log("refresh_all_registed_childrens");
 }
 
+/**
+ * It gets all the children from the database.
+ * 
+ * @return An array of objects.
+ */
 async function get_all_recoded_children() {
     try {
         const myidb = idb.wrap(await open_db("sefain_brain"))
@@ -903,6 +913,12 @@ function submit_registration() {
 **  for ex.==> trigger(document.querySelector("#introduction > div > form > div > div:nth-child(5) > div > input"),'click')
 */
 
+/**
+ * simulate the real cause trigger the event
+ * @param {HTMLElement} el 
+ * @param {Event} etype 
+ * @param {*} custom 
+ */
 const trigger = (el, etype, custom) => {
     const evt = custom ?? new Event(etype, { bubbles: true });
     el.dispatchEvent(evt);
