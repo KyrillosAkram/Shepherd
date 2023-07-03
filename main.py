@@ -18,7 +18,7 @@ from typing import Literal,Union,List,Dict,TypedDict,Any,Tuple
 # pylint: enable=W0611:unused-import
 
 from dataclasses import dataclass ,field
-from flask import Flask,Request
+from flask import Flask,request,Response
 from flask.helpers import send_file#, send_from_directory
 from cfg import *
 import re
@@ -58,7 +58,7 @@ class Volantier():
         self.normal_q:List[str]=[]
         self.in_progress_q:List[str]=[] #TODO refactor the type to be dict
         self.quit_request:bool=False
-        self.connectivity_q:List[tuple[float]]=List(maxsize=self.CONNECTIVITY_MAX_SIZE)
+        self.connectivity_q:List[tuple[float]]=[]#List(maxsize=self.CONNECTIVITY_MAX_SIZE)
         self.last_connection:float=time()
 
     def get_name(self)->str:
@@ -221,15 +221,14 @@ def regist_session(
 def regist_volantier()->Any:
     #TODO document this
     try:
-        result=Request.get_json()
+        result=request.get_json()
         if result==POST_NOK_BAD_FORMATE :
-            raise POST_NOK_BAD_FORMATE
+            raise ValueError( "POST_NOK_BAD_FORMATE")
 
-        aVolantierId:VolantierId=str(time)
-        volantiers_dict[aVolantierId]
-        volantiers_id.append(aVolantierId)
+        aVolantierId:VolantierId=str(time())
+        volantiers_dict[aVolantierId]=Volantier(aVolantierId,1,list())
         return aVolantierId,POST_OK
-    except:
+    except ValueError:
         return POST_NOK_BAD_FORMATE
 
 @app.route("/volantier/<string:volantier_id>/task",methods=['GET'])
