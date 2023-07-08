@@ -31,8 +31,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-export function createData(name, calories, fat, carbs, protein,selected=false) {
-    return   { selected: false, name, calories, fat, carbs, protein }
+export function createData(...cells) {
+    console.log({ selected: false, cells})
+    return   { selected: false, cells}
 }
 
 
@@ -69,9 +70,8 @@ function stableSort(array, comparator) {
 }
 
 
-export default function CustomizedTables(props)
+export default function CustomizedTable(props)
 {
-    //TODO: modify this component to be more generic by taking the header column and the initial body value
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
@@ -95,7 +95,7 @@ export default function CustomizedTables(props)
         {
             newSelected = rows.map((n) =>{return {...n,selected:true}} );
         }
-        console.log(newSelected);
+        // console.log(newSelected);
         setRows(newSelected);
     };
 
@@ -116,18 +116,6 @@ export default function CustomizedTables(props)
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
-    // Avoid a layout jump when reaching the last page with empty rows.
-    // const emptyRows =
-    //     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-    // const visibleRows = React.useMemo(
-    //     () =>
-    //         stableSort(rows, getComparator(order, orderBy)).slice(
-    //             page * rowsPerPage,
-    //             page * rowsPerPage + rowsPerPage,
-    //         ),
-    //     [order, orderBy, page, rowsPerPage],
-    // );
     return (
         <TableContainer component={Paper} style={{ width: 'auto', margin: '10px', alignContent: 'center' }}>
             <Table aria-label="customized table">
@@ -144,18 +132,15 @@ export default function CustomizedTables(props)
                                 }}
                             />
                         </StyledTableCell>
-                        <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-                        <StyledTableCell align="right">Calories</StyledTableCell>
-                        <StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-                        <StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-                        <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
+                        {
+                           props.header_cells.map((cell_text,cell_index)=><StyledTableCell align={props.columns_align[cell_index]}>{cell_text/*.replace(' ','&nbsp;')*/}</StyledTableCell>)
+                        }
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {/* <Typography>{props.rows.length}</Typography> */}
                     {
                         props.rows.map(
-                            (row) =><TableRecord data={row} rows={props.rows} setRows={props.setRows}/>
+                            (row) =><TableRecord align={props.columns_align} data={row} rows={props.rows} setRows={props.setRows}/>
                         )
                     }
                 </TableBody>
@@ -184,30 +169,31 @@ export function TableRecord(props) {
         let new_rows=props.rows
         new_rows[props.rows.indexOf(props.data)]=toggled
         props.setRows(new_rows.map((e)=>{return e}))
-        console.log(props.data)
+        // console.log(props.data)
 
         // setSelected(newSelected);
     };
     // console.log(props.data )
     return (
-        <StyledTableRow key={props.data.name}>
+        <StyledTableRow key={props.data.cells[0]}>{
+            //.cells[0]
+        }
         <StyledTableCell padding="checkbox">
             <Checkbox
                 color="primary"
                 checked={props.data.selected}
-                // inputProps={{
-                //     'aria-labelledby': labelId,
-                // }}
                 onChange={handleClick}
             />
         </StyledTableCell>
-        <StyledTableCell component="th" scope="row"  >
+        {
+            props.data.cells.map((cell_text,cell_index)=><StyledTableCell align={props.align[cell_index]}>{cell_text  }</StyledTableCell>)
+        }
+        {/* <StyledTableCell component="th" scope="row"  >
             {props.data.name}
         </StyledTableCell>
         <StyledTableCell align="right">{props.data.calories  }</StyledTableCell>
-        <StyledTableCell align="right">{props.data.fat       }</StyledTableCell>
-        <StyledTableCell align="right">{props.data.carbs     }</StyledTableCell>
-        <StyledTableCell align="right">{props.data.protein   }</StyledTableCell>
+        <StyledTableCell align="right">{props.data.fat       }</StyledTableCell> */}
+
     </StyledTableRow>
 )
 }

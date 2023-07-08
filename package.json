@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "@mui/lab": "^5.0.0-alpha.130",
+    "@mui/material": "^5.13.1",
     "jsdoc": "^4.0.0",
     "jsdoc-plantuml": "^1.0.2",
     "materialize-css": "^1.0.0-rc.2"

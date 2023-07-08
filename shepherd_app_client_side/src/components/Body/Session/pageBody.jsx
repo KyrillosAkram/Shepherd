@@ -16,23 +16,24 @@ import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
 import RuleIcon from '@mui/icons-material/Rule';
 import Typography from "@mui/material/Typography";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import CustomizedTables, { createData } from "./list_table";
+import CustomizedTable, { createData } from "./list_table";
 function NestedList() {
   const [openGoing, setOpenGoing] = React.useState(false);
   const [openReturning, setOpenReturning] = React.useState(false);
   const [openMissing, setOpenMissing] = React.useState(false);
   const [Going_count, setGoing_count] = React.useState(0);
   const [Going_list, setGoing_list] = React.useState([
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Frozeyoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclir', 262, 16.0, 24, 6.0),
-    createData('Cupake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9)
+    createData('Frozen yoghurt', 159, 6.0),
+    createData('Ice cream sandwich', 237, 9.0),
+    createData('Eclair', 262, 16.0),
+    createData('Cupcake', 305, 3.7),
+    createData('Frozeyoghurt', 159, 6.0),
+    createData('Ice sandwich', 237, 9.0),
+    createData('Eclir', 262, 16.0),
+    createData('Cupake', 305, 3.7),
+    createData('Gingerbread', 356, 16.0)
   ]);
+  //TODO:hook updating counter once any change takes place to any of list
   const [Missing_count, setMissing_count] = React.useState(0);
   const [Returning_count, setReturning_count] = React.useState(0);
   const [Returning_list, setReturning_list] = React.useState([]);
@@ -70,7 +71,11 @@ function NestedList() {
         </ListItemButton>
         <Collapse in={openGoing} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <CustomizedTables rows={Going_list} setRows={setGoing_list} />
+            <CustomizedTable header_cells={[
+                "Name",
+                "Class",
+                "Address"
+              ]} columns_align={['left','right','right']} rows={Going_list} setRows={setGoing_list} />
           </List>
         </Collapse>
       </List>
@@ -87,9 +92,12 @@ function NestedList() {
         </ListItemButton>
         <Collapse in={openReturning} timeout="auto" unmountOnExit>
           <List component='div' disablePadding>
-            <Typography>
-              bal7
-            </Typography>
+            <CustomizedTable header_cells={[
+                "Name",
+                "Class",
+                "Address"
+              ]} columns_align={['left','right','right']} rows={Returning_list} setRows={setReturning_list} />
+
           </List>
         </Collapse>
       </List>
@@ -106,9 +114,12 @@ function NestedList() {
         </ListItemButton>
         <Collapse in={openMissing} timeout="auto" unmountOnExit>
           <List component='div' disablePadding>
-            <Typography>
-              bal7
-            </Typography>
+            <CustomizedTable header_cells={[
+                "Name",
+                "Class",
+                "Address"
+              ]} columns_align={['left','right','right']} rows={Missing_list} setRows={setMissing_list} />
+
           </List>
         </Collapse>
       </List>
