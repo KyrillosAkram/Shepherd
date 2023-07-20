@@ -34,10 +34,29 @@ function NestedList() {
     createData('Gingerbread', 356, 16.0)
   ]);
   //TODO:hook updating counter once any change takes place to any of list
+/**
+ * 
+ */
   const [Missing_count, setMissing_count] = React.useState(0);
   const [Returning_count, setReturning_count] = React.useState(0);
   const [Returning_list, setReturning_list] = React.useState([]);
   const [Missing_list, setMissing_list] = React.useState([]);
+
+  const setGoing_list_wrapper=(newState)=>{
+    setGoing_list(newState)
+    if(newState.length)setGoing_count(newState.length);
+  }
+
+  const setReturning_list_wrapper=(newState)=>{
+    setReturning_list(newState)
+    if(newState.length)setReturning_count(newState.length);
+  }
+
+  const setMissing_list_wrapper=(newState)=>{
+    setMissing_list(newState)
+    if(newState.length)setMissing_count(newState.length);
+  }
+  
   const handleClick = (e) => {
     switch (e.target.innerText) {
       case "Going":
@@ -75,7 +94,7 @@ function NestedList() {
                 "Name",
                 "Class",
                 "Address"
-              ]} columns_align={['left','right','right']} rows={Going_list} setRows={setGoing_list} />
+              ]} columns_align={['left','right','right']} rows={Going_list} setRows={setGoing_list_wrapper} />
           </List>
         </Collapse>
       </List>
@@ -96,7 +115,7 @@ function NestedList() {
                 "Name",
                 "Class",
                 "Address"
-              ]} columns_align={['left','right','right']} rows={Returning_list} setRows={setReturning_list} />
+              ]} columns_align={['left','right','right']} rows={Returning_list} setRows={setReturning_list_wrapper} />
 
           </List>
         </Collapse>
@@ -118,7 +137,7 @@ function NestedList() {
                 "Name",
                 "Class",
                 "Address"
-              ]} columns_align={['left','right','right']} rows={Missing_list} setRows={setMissing_list} />
+              ]} columns_align={['left','right','right']} rows={Missing_list} setRows={setMissing_list_wrapper} />
 
           </List>
         </Collapse>
