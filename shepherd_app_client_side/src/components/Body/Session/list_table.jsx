@@ -90,10 +90,12 @@ export default function CustomizedTable(props)
         console.log(rows[0].selected)
         if (rows[0].selected) {
             newSelected = rows.map((n) =>{return {...n,selected:false}} );
+            props.setSelected_count(0)
         }
         else
         {
             newSelected = rows.map((n) =>{return {...n,selected:true}} );
+            props.setSelected_count(rows.length)
         }
         // console.log(newSelected);
         setRows(newSelected);
@@ -130,6 +132,7 @@ export default function CustomizedTable(props)
                                 inputProps={{
                                     'aria-label': 'select all desserts',
                                 }}
+                                disabled={props.rows.length>0?false:true}
                             />
                         </StyledTableCell>
                         {
@@ -140,7 +143,7 @@ export default function CustomizedTable(props)
                 <TableBody>
                     {
                         props.rows.map(
-                            (row) =><TableRecord align={props.columns_align} data={row} rows={props.rows} setRows={props.setRows}/>
+                            (row) =><TableRecord align={props.columns_align} data={row} rows={props.rows} setRows={props.setRows} selected_count={props.selected_count} setSelected_count={props.setSelected_count}/>
                         )
                     }
                 </TableBody>
@@ -159,12 +162,14 @@ export function TableRecord(props) {
         {
             toggled = {...props.data,selected:false}
             event.target.checked=false
+            props.setSelected_count(props.selected_count>0?props.selected_count-1:0)
         }
         
         else
         {
             toggled = {...props.data,selected:true}
             event.target.checked=true    
+            props.setSelected_count(props.selected_count+1)
         }
         let new_rows=props.rows
         new_rows[props.rows.indexOf(props.data)]=toggled
@@ -188,11 +193,6 @@ export function TableRecord(props) {
         {
             props.data.cells.map((cell_text,cell_index)=><StyledTableCell align={props.align[cell_index]}>{cell_text  }</StyledTableCell>)
         }
-        {/* <StyledTableCell component="th" scope="row"  >
-            {props.data.name}
-        </StyledTableCell>
-        <StyledTableCell align="right">{props.data.calories  }</StyledTableCell>
-        <StyledTableCell align="right">{props.data.fat       }</StyledTableCell> */}
 
     </StyledTableRow>
 )

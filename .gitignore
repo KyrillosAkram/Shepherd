@@ -1,3 +1,6 @@
 carelessscript.mySteamPasskey.txt
 node_modules
 shepherd_app_client_side/README.md
+node_modules/.package-lock.json
+shepherd_app_client_side/package-lock.json
+node_modules/.package-lock.json
