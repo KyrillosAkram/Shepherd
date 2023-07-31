@@ -32,7 +32,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export function createData(...cells) {
-    console.log({ selected: false, cells})
     return   { selected: false, cells}
 }
 

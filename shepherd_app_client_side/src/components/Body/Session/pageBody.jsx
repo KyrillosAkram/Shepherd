@@ -17,6 +17,19 @@ import RuleIcon from '@mui/icons-material/Rule';
 import Typography from "@mui/material/Typography";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import CustomizedTable, { createData } from "./list_table";
+import ActionMenu from "./ActionMenu";
+import Paper from '@mui/material/Paper';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+// import ListItemText from '@mui/material/ListItemText';
+// import ListItemIcon from '@mui/material/ListItemIcon';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
+import SaveIcon from '@mui/icons-material/Save';
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
 function NestedList(props) {
  
   const handleClick = (e) => {
@@ -190,7 +203,15 @@ export default function Session_page_body() {
     setMissing_list(newState)
     if(newState.length)setMissing_count(newState.length);
   }
- 
+  
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+  setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+  setAnchorEl(null);
+  };
   return (
     <div>
       <Stack
@@ -198,9 +219,16 @@ export default function Session_page_body() {
         spacing={0.5}
         alignItems={"right"}
       >
-        <Fab disabled={false} loading color="primary" aria-label="add" size="small">
+        <Fab disabled={false} loading color="primary" aria-label="add" size="small"
+         id="action-button"
+        aria-controls={open ? 'action-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        >
           <MoreHorizIcon />
         </Fab>
+
         <Fab disabled={!(openGoing || openReturning)} color="primary" aria-label="add" size="small">
           <GroupAddIcon />
         </Fab>
@@ -220,6 +248,71 @@ export default function Session_page_body() {
         >
           <GroupRemoveIcon />
         </Fab>
+      <Menu 
+              id="action-menu"
+              aria-labelledby="action-button"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+      >
+        <MenuItem>
+          <ListItemIcon>
+            <PlayArrowIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Start Session</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <StopIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>End Session</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <SaveIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Save Session</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <SettingsBackupRestoreIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Load Session</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <UploadIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Import</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <DownloadIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Export</ListItemText>
+        </MenuItem>
+        {/* <MenuItem>
+          <ListItemIcon>
+            <CloseIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Close</ListItemText>
+        </MenuItem>
+        <MenuItem>
+          <ListItemIcon>
+            <SaveIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Paste</ListItemText>
+        </MenuItem> */}
+      </Menu>
+  
 
       </Stack>
       <Stack
