@@ -10,6 +10,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import BadgeIcon from '@mui/icons-material/Badge';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 export default function SwipeableTemporaryDrawer(props) {
   const drawerState =props.drawerState
@@ -34,24 +37,38 @@ export default function SwipeableTemporaryDrawer(props) {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
+        <ListItem key={'Registration'} disablePadding>
+          <ListItemButton onClick={()=>{props.setPageName("Registration")}}>
+            <ListItemIcon>
+              <BadgeIcon />
+            </ListItemIcon>
+            <ListItemText primary={'Registration'} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem key={'Registed'} disablePadding>
+          <ListItemButton onClick={()=>{props.setPageName("Registed")}}>
+            <ListItemIcon>
+              <ManageSearchIcon />
+            </ListItemIcon>
+            <ListItemText primary={'Registed'} />
+          </ListItemButton>
           </ListItem>
-        ))}
+          <ListItem key={'Session'} disablePadding>
+            <ListItemButton onClick={()=>{props.setPageName("Session")}}>
+              <ListItemIcon>
+                <FamilyRestroomIcon />
+              </ListItemIcon>
+              <ListItemText primary={'Session'} />
+            </ListItemButton>
+        </ListItem>
       </List>
       <Divider />
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
+        {['soon', 'soon', 'soon'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                <InboxIcon />
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>

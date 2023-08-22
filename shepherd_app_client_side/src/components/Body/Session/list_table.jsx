@@ -153,9 +153,9 @@ export default function CustomizedTable(props)
 
 
 export function TableRecord(props) {
-    function handleClick(event) {
+    const handleClick = React.useCallback((event) =>{
         let toggled ={}
-        console.log(event.target.checked)
+        // console.log(event.target.checked)
 
         if (props.data.selected)
         {
@@ -176,7 +176,7 @@ export function TableRecord(props) {
         // console.log(props.data)
 
         // setSelected(newSelected);
-    };
+    },[props.data,props.selected_count,props.rows,props.selected]);
     // console.log(props.data )
     return (
         <StyledTableRow key={props.data.cells[0]}>{

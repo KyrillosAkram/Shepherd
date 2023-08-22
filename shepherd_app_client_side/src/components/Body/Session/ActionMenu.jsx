@@ -66,18 +66,6 @@ export default function ActionMenu(props) {
           </ListItemIcon>
           <ListItemText>Export</ListItemText>
         </MenuItem>
-        {/* <MenuItem>
-          <ListItemIcon>
-            <CloseIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Close</ListItemText>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <SaveIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Paste</ListItemText>
-        </MenuItem> */}
       </MenuList>
     </Paper>
   );

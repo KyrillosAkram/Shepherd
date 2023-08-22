@@ -179,10 +179,9 @@ export default function Session_page_body() {
     createData('Ice cream sandwich', 237, 9.0),
     createData('Gingerbread', 356, 16.0)
   ]);
+  
   //TODO: [implemented to be tested] hook updating counter once any change takes place to any of list
-/**
- * 
- */
+  
   const [Missing_count, setMissing_count] = React.useState(0);
   const [Returning_count, setReturning_count] = React.useState(0);
   const [Returning_list, setReturning_list] = React.useState([]);
@@ -299,18 +298,6 @@ export default function Session_page_body() {
           </ListItemIcon>
           <ListItemText>Export</ListItemText>
         </MenuItem>
-        {/* <MenuItem>
-          <ListItemIcon>
-            <CloseIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Close</ListItemText>
-        </MenuItem>
-        <MenuItem>
-          <ListItemIcon>
-            <SaveIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Paste</ListItemText>
-        </MenuItem> */}
       </Menu>
   
 
