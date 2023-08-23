@@ -5,6 +5,9 @@ import { useState , createContext ,useEffect ,useRef,Provider  } from 'react';
 import  CustomAppBar  from './components/AppBar';
 import  AppBody from './components/AppBody';
 import ResponsiveDrawer from './components/AppDrawer';
+import { AppGlobalContext } from './context';
+import {open_db} from './db';
+
 function App() {
   const [progressCircleState,setProgressCircleState]=useState('none')
   const [pageName,setPageName]=useState('Session')
@@ -18,7 +21,7 @@ function App() {
   const [captureVideo, setCaptureVideo] = useState(false);
   let render_count=0;
   window.faceapi=faceapi;
-
+  open_db();
   useEffect(() => {
     if(render_count===0)
 {    const loadModels = async () => {
@@ -27,7 +30,7 @@ function App() {
       setProgressCircleState('progress')
       Promise.all([
         window.faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), 
+        window.faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL), 
         window.faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
         window.faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
       ]).then(
@@ -46,11 +49,9 @@ console.log(`render_count ${render_count}`)
     Bar:{/*progressCircleState,*/setProgressCircleState},
     Body:{/*pageName,*/setPageName},
     Drawer:{ /*drawerState,*/ setdrawerState},
-    API:{faceapi,},
     // FaceAPIWorker:{get_face_discribtor},
   }
 
-  const AppGlobalContext=createContext(AppCTRL)
     
   // TODO: create context passing controler and web worker to all children
   // and the controller will be an object encapsulate worker methods and function from old app.js

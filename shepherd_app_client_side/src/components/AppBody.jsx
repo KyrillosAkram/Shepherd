@@ -36,7 +36,7 @@ export default function AppBody(props) {
           <Registration_page_body/>
         </TabPanel>
       </TabContext>
-      <CustomizedSnackbars/>
+      {/* <CustomizedSnackbars/> */}
     </Box>
   );
 }

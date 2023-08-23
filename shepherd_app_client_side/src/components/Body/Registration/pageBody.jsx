@@ -4,35 +4,45 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MenuItem from '@mui/material/MenuItem';
 import CheckIcon from '@mui/icons-material/Check';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateField } from '@mui/x-date-pickers/DateField';
+// import {AppGlobalContext} from '../../../context';
 
 function Registration_page_body() {
     const [geoLocation, setGeoLocation] = React.useState();
+    const [personName, setPersonName] = React.useState();
+    const [personAddress, setPersonAddress] = React.useState();
+    const [personPhone, setPersonPhone] = React.useState();
+    const [personClass,setPersonClass] = React.useState();
+    const [personBirthdate, setPersonBirthdate] = React.useState();
+    const [activation, setActivation] = React.useState(true);
+    // const [AppGlobalContxt] = React.useContext(AppGlobalContext);
     function set_location(position) {
-        // console.log('set_location')
-        // console.log(position)
         setGeoLocation(position.coords.latitude + ',' + position.coords.longitude)
     }
     async function fill_with_current_location() {
-      if (navigator.geolocation) {
-        console.log(navigator.geolocation.getCurrentPosition)
-          navigator.geolocation.getCurrentPosition(set_location);
-    //        console.log( "Geolocation is detected" );
-        console.log("Geolocation is detected")
-      } else {
-    //        console.log( "Geolocation is not supported by this browser." );
-        console.log("Geolocation is not supported by this browser.")
-      }
+        // console.log(AppGlobalContxt)
+        if (navigator.geolocation) {
+            console.log(navigator.geolocation.getCurrentPosition)
+            navigator.geolocation.getCurrentPosition(set_location);
+            console.log("Geolocation is detected")
+        } else {
+            console.log("Geolocation is not supported by this browser.")
+        }
     }
 
     function submit_registration() {
     let check_counter = 7
-    Boolean(document.querySelector("#registration_cam").value) ? check_counter-- : console.log( "please select/take image" );
-    (Boolean(document.querySelector("#Name").value)) ? check_counter-- : console.log( "please enter the name" );
-    (Boolean(document.querySelector("#Address").value)) ? check_counter-- : console.log( "please enter the address" );
-    (Boolean(document.querySelector("#Location").value)) ? check_counter-- : console.log( "please enter the location" );
-    (Boolean(document.querySelector("#Class").value)) ? check_counter-- : console.log( "please choose class" );
-    (Boolean(document.querySelector("#telephone").value)) ? check_counter-- : console.log( "please enter the telephone" );
-    (Boolean(document.querySelector("#birthdate").value)) ? check_counter-- : console.log( "please enter the birthdate" );
+    //TODO: implement warning on snak bar
+    !Boolean(document.getElementById("registration_cam").value =='') ? check_counter-- : console.log( "please select/take image" );
+    (Boolean(personName     )) ? check_counter-- : console.log( "please enter the name"      );
+    (Boolean(personAddress  )) ? check_counter-- : console.log( "please enter the address"   );
+    (Boolean(geoLocation    )) ? check_counter-- : console.log( "please enter the location"  );
+    (Boolean(personClass    )) ? check_counter-- : console.log( "please choose class"        );
+    (Boolean(personPhone    )) ? check_counter-- : console.log( "please enter the telephone" );
+    (Boolean(personBirthdate)) ? check_counter-- : console.log( "please enter the birthdate" );
     if (!check_counter) {// if all checks are ok
         if (Boolean(window.db)) {
             try {
@@ -41,27 +51,34 @@ function Registration_page_body() {
                 Promise.all([new window.faceapi.LabeledFaceDescriptors(document.querySelector("#Name").value, [window.registration_discriptor.descriptor])]).then((values) => {
                     children.put(
                         {
-                            Name: document.querySelector("#Name").value,
-                            Address: document.querySelector("#Address").value,
-                            Location: document.querySelector("#Location").value,
-                            Class: document.querySelector("#Class").value,
+                            Name: personName,
+                            Address: personAddress,
+                            Location: geoLocation,
+                            Class: personClass,
                             Discriptor: values[0],
-                            Telephone: document.querySelector("#telephone").value,
-                            Birthdate: document.querySelector("#birthdate").value
+                            Telephone: personPhone,
+                            Birthdate: personBirthdate
                         }
                     )
                     /*debugging &*/ console.log("children.add");
                     /*debugging &*/ console.log(values)
                     window.registration_discriptor = null
-                    document.querySelector("#Name").value = ''
-                    document.querySelector("#Address").value = ''
-                    document.querySelector("#Location").value = ''
-                    document.querySelector("#Class").value = '?'
-                    document.querySelector("li.selected").classList.remove("selected")
-                    document.querySelector("li.disabled").classList.add("selected")
-                    document.querySelector("#telephone").value = ''
-                    document.querySelector("#birthdate").value = ''
-                    document.querySelector("#registeration_submit").classList.add("disabled")
+                    setPersonName(undefined)
+                    setPersonAddress(undefined)
+                    setGeoLocation(undefined)
+                    setPersonClass(undefined   )
+                    setPersonPhone(undefined)
+                    setPersonBirthdate(undefined)
+                    // document.querySelector("#Name").value = ''
+                    // document.querySelector("#Address").value = ''
+                    // document.querySelector("#Location").value = ''
+                    // document.querySelector("#Class").value = '?'
+                    // document.querySelector("li.selected").classList.remove("selected")
+                    // document.querySelector("li.disabled").classList.add("selected")
+                    // document.querySelector("#telephone").value = ''
+                    // document.querySelector("#birthdate").value = ''
+                    // document.querySelector("#registeration_submit").classList.add("disabled")
+                    setActivation(true)
                 })
                 window.registration_discriptor = null;
             } catch (error) {
@@ -72,6 +89,7 @@ function Registration_page_body() {
     } else {
         console.log( "Please fill all filds !!!" )
     }
+    
 }
     
     return (
@@ -103,6 +121,7 @@ function Registration_page_body() {
                                     console.log(event)
                                     window.registration_discriptor = { ...event }
                                     /*debugging &*/ console.log("remove disable");
+                                    setActivation(false)
                                     // document.querySelector("#registeration_submit").removeClass("disabled")
                                 }).catch((e)=>console.log(e))
                             }
@@ -124,7 +143,13 @@ function Registration_page_body() {
                                 label="Name"
                                 autoFocus
                                 variant='standard'
-                                margin='none'  
+                                margin='none'
+                                value={personName}
+                                onChange={
+                                    (e) => {
+                                        setPersonName(e.target.value)
+                                    }
+                                }
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -137,6 +162,12 @@ function Registration_page_body() {
                                 autoComplete="Address"
                                 variant='standard'
                                 margin='none'
+                                value={personAddress}
+                                onChange={
+                                    (e) => {
+                                        setPersonAddress(e.target.value)
+                                    }
+                                }
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -145,15 +176,16 @@ function Registration_page_body() {
                                 select
                                 label="Class"
                                 defaultValue=""
-                                // SelectProps={{
-                                //     native: true,
-                                // }}
-                                // helperText="Please select your currency"
                                 variant="standard"
                                 fullWidth
-                                // size='medium'
                                 margin='none'
                                 required
+                                value={personClass}
+                                onChange={
+                                    (e) => {
+                                        setPersonClass(e.target.value)
+                                    }
+                                }
                             >
                                 
                                 <MenuItem key={0} value={0}>0</MenuItem>
@@ -172,8 +204,6 @@ function Registration_page_body() {
                                 type='date'
                                 defaultValue=""
                                 fullWidth
-                                // value={}
-                                // onChange={}
                                 id="Birthdate"
                                 label="Birthdate"
                                 name="Birthdate"
@@ -181,7 +211,36 @@ function Registration_page_body() {
                                 variant='standard'
                                 margin='none'
                                 focused
+                                format="DD-MM-YYYY"
+                                value={personBirthdate}
+                                onChange={
+                                    (e) => {
+                                        setPersonBirthdate(e.target.value)
+                                    }
+                                }
                             />
+                            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker
+                                required
+                                type='date'
+                                defaultValue=""
+                                fullWidth
+                                id="Birthdate"
+                                label="Birthdate"
+                                name="Birthdate"
+                                // autoComplete="Birthdate"
+                                variant='standard'
+                                margin='none'
+                                focused
+                                format="DD-MM-YYYY"
+                                value={personBirthdate}
+                                onChange={
+                                    (e) => {
+                                        setPersonBirthdate(e.target.value)
+                                    }
+                                }
+                              />
+                            </LocalizationProvider> */}
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -194,6 +253,12 @@ function Registration_page_body() {
                                 type='tel'
                                 variant='standard'
                                 margin='none'
+                                value={personPhone}
+                                onChange={
+                                    (e) => {
+                                        setPersonPhone(e.target.value)
+                                    }
+                                }
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -217,14 +282,14 @@ function Registration_page_body() {
                     </Fab>
                     </Grid>                   
                     </Grid>
-                    <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={false} sx={{ mt: 3, mb: 2 }} >
+                    <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={()=>submit_registration()}>
                         
                     <CheckIcon/>
                     Submit
                     </Fab>
-                        <div class="row" id="image_section"></div>
                 </Box>
             </Box>
+            <div class="row" id="image_section"></div>
         </Container>
     );
 }
