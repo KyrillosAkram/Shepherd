@@ -211,6 +211,109 @@ export default function Session_page_body() {
   const handleClose = () => {
   setAnchorEl(null);
   };
+  
+function Session_state_to_obj() {
+    return {
+        Going_list: [...Going_list] ,
+        Returning_list: [...Returning_list] ,
+        Missing_list: [...Missing_list]
+    }
+}
+function Session_Actions_Start() {
+    if (Boolean(localStorage.getItem("session_running")) & Boolean(localStorage.getItem("last_session"))) {
+        if (window.confirm("found last session saved with running state, Do you want to resume last session ?")) {
+            Session_Actions_Load();
+            window.session_running = setInterval(Session_Actions_Save, 1000);
+            // M.toast({ html: "last session resumed" })
+        }
+        else {
+            localStorage.setItem("session_running", true)
+            localStorage.removeItem("last_session")
+            window.session_running = setInterval(Session_Actions_Save, 1000);
+        }
+    }
+    else {
+        localStorage.setItem("session_running", true)
+        localStorage.removeItem("last_session")
+        window.session_running = setInterval(Session_Actions_Save, 1000);
+    }
+
+}
+function Session_Actions_End() {
+    localStorage.removeItem("session_running")
+    localStorage.removeItem("last_session")
+    clearInterval(window.session_running);
+    window.session_running = undefined
+
+}
+function Session_Actions_Save() {
+    localStorage.setItem("last_session", JSON.stringify(Session_state_to_obj()))
+}
+function read_file_as_string(file) {
+    let reader = new FileReader()
+    return new Promise((resolve, reject) => {
+        reader.onerror = () => {
+            reject(new DOMException("Problem parsing input file."))
+        }
+        reader.onload = () => {
+            resolve(reader.result)
+        }
+        reader.readAsText(file)
+    })
+}
+function Session_Actions_Load()
+{
+  let last_session = localStorage.getItem("last_session")
+  last_session = last_session ? JSON.parse(last_session) : null;
+  if (last_session)
+  {
+      if (last_session.Going_list)
+      {
+        setGoing_list_wrapper(last_session.Going_list)
+        setReturning_list_wrapper(last_session.Returning_list)
+        setMissing_list_wrapper(last_session.Missing_list)
+      }
+  }
+}
+async function Session_check_import_json(event) {
+  let input_element =event.target
+  console.log(input_element)
+  try {
+      if (input_element.files.length) {
+        let json_content = await read_file_as_string(input_element.files[0])
+        let sessionObj = JSON.parse(json_content)
+        if (sessionObj)
+        {
+            if (sessionObj.Going_list)
+            {
+              setGoing_list_wrapper(sessionObj.Going_list)
+              setReturning_list_wrapper(sessionObj.Returning_list)
+              setMissing_list_wrapper(sessionObj.Missing_list)
+            }
+        }
+      }
+  }
+  catch (any) {
+      console.error(any)
+  }
+}
+function Session_Actions_Import() {
+  console.log(document.querySelector("input#json_input"))
+  let input_element = document.querySelector("input#json_input")
+  input_element.addEventListener("change", Session_check_import_json)
+    document.querySelector("input#json_input").click()
+}
+
+function Session_Actions_Export() {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Session_state_to_obj()));
+    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "session" + Date.now().toString() + ".json");
+    dlAnchorElem.click();
+
+}
+
+
   return (
     <div>
       <Stack
@@ -262,37 +365,39 @@ export default function Session_page_body() {
                 horizontal: 'left',
               }}
       >
-        <MenuItem>
+        <MenuItem onClick={Session_Actions_Start}>
           <ListItemIcon>
             <PlayArrowIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Start Session</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={Session_Actions_End}>
           <ListItemIcon>
             <StopIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>End Session</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={Session_Actions_Save}>
           <ListItemIcon>
             <SaveIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Save Session</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={Session_Actions_Load} >
           <ListItemIcon>
             <SettingsBackupRestoreIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Load Session</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem 
+        onClick={Session_Actions_Import}
+        >
           <ListItemIcon>
             <UploadIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Import</ListItemText>
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={Session_Actions_Export}>
           <ListItemIcon>
             <DownloadIcon fontSize="small" />
           </ListItemIcon>
@@ -330,8 +435,11 @@ export default function Session_page_body() {
           setReturning_selected_count={setReturning_selected_count}
           
         />
-
+      
       </Stack>
+          <a id={"downloadAnchorElem"} class={"hidden"}  ></a>
+          <input type={"file"} id={"json_input"} class={ "hidden" } accept={ ".json,application/json" }
+                onchange={ (e)=>{console.log(e);Session_check_import_json(this)}}/>
     </div>
   )
 }
