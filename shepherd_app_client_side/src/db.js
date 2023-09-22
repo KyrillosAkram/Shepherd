@@ -1,3 +1,5 @@
+import {wrap,openDB} from 'idb'
+
 function refresh_all_registed_childrens() {
     let myreq = window.db.transaction(["children"], "readwrite").objectStore("children").getAll()
     // myreq.onerror = (event) => M.toast({ html: event });
@@ -19,6 +21,7 @@ async function open_db(db_name) {
 
         request.onupgradeneeded = (event) => {
             var db = event.target.result;
+            // window.idb = wrap(db);
             // const tx=db.transaction("notes","write");
             let children = db.createObjectStore("children", { keyPath: "Name" });
 
@@ -27,6 +30,7 @@ async function open_db(db_name) {
         request.onsuccess = (event) => {
             var db = event.target.result;
             window.db = db;// backward compatiblity
+            window.idb = wrap(window.db);
             refresh_all_registed_childrens()
             /*debugging &*/ console.log("successful");
             resolve(db)

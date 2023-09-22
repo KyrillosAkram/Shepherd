@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
@@ -16,7 +16,7 @@ import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
 import RuleIcon from '@mui/icons-material/Rule';
 import Typography from "@mui/material/Typography";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import CustomizedTable, { createData } from "./list_table";
+import CustomizedTable, { createData } from "../../Common_Components/List_Table/list_table";
 import ActionMenu from "./ActionMenu";
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
@@ -30,6 +30,15 @@ import SaveIcon from '@mui/icons-material/Save';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
+import ManualAddModal from "../../Common_Components/manual_add_Modal/ManualAddModal";
+
+
+/**
+ * Renders a nested list component with collapsible sections.
+ *
+ * @param {object} props - The properties passed to the component.
+ * @return {JSX.Element} The rendered nested list component.
+ */
 function NestedList(props) {
  
   const handleClick = (e) => {
@@ -188,13 +197,36 @@ export default function Session_page_body() {
   const [Missing_list, setMissing_list] = React.useState([]);
   const [Going_selected_count,setGoing_selected_count]= React.useState([]);
   const [Returning_selected_count,setReturning_selected_count]= React.useState([]);
+  const [manualAdd, setManualAdd] = React.useState(false);
+  const refGoing_list = React.useRef(Going_list);
+  const refReturning_list = React.useRef(Returning_list);
+  const refOpenGoing=React.useRef(openGoing)
+  const refOpenReturning=React.useRef(openReturning)
+  useEffect(()=>{
+    refGoing_list.current=Going_list
+    refReturning_list.current=Returning_list
+    refOpenGoing.current=openGoing
+    refOpenReturning.current=openReturning
+    console.log("session page body rendered")
+  })
+
+  /**
+   * Sets the going list wrapper.
+   *
+   * @param {type} newState - the new state
+   * @return {type} undefined
+   * 
+   * @description setGoing_list_wrapper that takes a parameter newState. It sets the value of Going_list to the newState and updates Going_count based on the length of newState.
+   */
   const setGoing_list_wrapper=(newState)=>{
     setGoing_list(newState)
+    // refGoing_list.current = newState
     if(newState.length)setGoing_count(newState.length);
   }
 
   const setReturning_list_wrapper=(newState)=>{
     setReturning_list(newState)
+    // refReturning_list.current = newState
     if(newState.length)setReturning_count(newState.length);
   }
 
@@ -330,8 +362,10 @@ function Session_Actions_Export() {
         >
           <MoreHorizIcon />
         </Fab>
-
-        <Fab disabled={!(openGoing || openReturning)} color="primary" aria-label="add" size="small">
+        {/* the ^ operator is used to prevent the button from being activated when going and returning are opened in the same time and the end used add by wrong manually to both of them and this simple operation reduce alot of logical code to handle this */}
+        <Fab disabled={!(openGoing ^ openReturning)} color="primary" aria-label="add" size="small"
+          onClick={()=>setManualAdd(true)}
+          >
           <GroupAddIcon />
         </Fab>
         <Fab disabled={!(openGoing || openReturning)} color="primary" aria-label="add" size="small">
@@ -433,13 +467,12 @@ function Session_Actions_Export() {
           setGoing_selected_count={setGoing_selected_count}
           Returning_selected_count={Returning_selected_count}
           setReturning_selected_count={setReturning_selected_count}
-          
         />
-      
       </Stack>
           <a id={"downloadAnchorElem"} class={"hidden"}  ></a>
           <input type={"file"} id={"json_input"} class={ "hidden" } accept={ ".json,application/json" }
                 onchange={ (e)=>{console.log(e);Session_check_import_json(this)}}/>
+        <ManualAddModal open={manualAdd} setOpen={setManualAdd} setGoing_list={setGoing_list_wrapper} setReturning_list={setReturning_list_wrapper} refGoing_list={refGoing_list} refReturning_list={refReturning_list} refOpenGoing={refOpenGoing} refOpenReturning={refOpenReturning}/>
     </div>
   )
 }
