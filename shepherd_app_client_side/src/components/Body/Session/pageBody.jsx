@@ -31,6 +31,7 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import ManualAddModal from "../../Common_Components/manual_add_Modal/ManualAddModal";
+import { AppGlobalContext } from "../../../App";
 
 
 /**
@@ -202,6 +203,7 @@ export default function Session_page_body() {
   const refReturning_list = React.useRef(Returning_list);
   const refOpenGoing=React.useRef(openGoing)
   const refOpenReturning=React.useRef(openReturning)
+  const AppCTRL=React.useContext(AppGlobalContext)
   useEffect(()=>{
     refGoing_list.current=Going_list
     refReturning_list.current=Returning_list
@@ -346,6 +348,140 @@ function Session_Actions_Export() {
 }
 
 
+function Session_check_input_add(input) {
+  console.log(input)
+  if (input?.files?.length) {
+      Session_detect_descriptors(input.files)
+  }
+
+}
+
+async function get_all_recoded_discriptors()
+{
+  
+  const obj = window.idb.transaction('children', 'readwrite').objectStore('children')
+  let records = await obj.getAll()
+  records = records.map(record => { return { ...record, Discriptor: new window.faceapi.LabeledFaceDescriptors(record.Discriptor._label, [new Float32Array(Discriptor_parser(record.Discriptor._descriptors[0]))]) } })
+  return records
+
+}
+
+function Discriptor_parser(Discriptor) {
+  let a = []
+  for (let i in Discriptor) {
+      a.push(Discriptor[i])
+  }//if(typeof(Discriptor)!=)
+  return a
+}
+
+
+
+async function Session_detect_descriptors(buffers) {
+  try
+  {
+      Window.Session_detect_descriptors_result = []
+      // let fake = document.querySelector("div#fake_div")
+      let detected_descriotor_arr = await Promise.all(//to await image
+          [...buffers].map(window.faceapi.bufferToImage)
+      )
+      for (let image of detected_descriotor_arr) {
+          Window.Session_detect_descriptors_result.push(await window.faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors())
+      }
+      console.log(Window.Session_detect_descriptors_result)
+      const descriptors_arrs = Window.Session_detect_descriptors_result.flat()
+      console.log(descriptors_arrs)
+      let all_recoded_children = await get_all_recoded_discriptors()
+      console.log(all_recoded_children)
+      let registed_d = all_recoded_children.map(record => { return record.Discriptor })
+      console.log(registed_d)
+      let faceMatcher = new window.faceapi.FaceMatcher(registed_d, 0.6)
+      let found_children = null
+      found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
+      console.log(found_children) //.map(child_data => child_data.toString()))
+      Session_active_table_add_children(found_children.map(child => child._label))
+      // setTimeout(() => {
+      //     tbodys = document.querySelectorAll('tbody')
+      //     document.querySelector("span#Going").innerText = tbodys[0].getElementsByTagName("tr").length
+      //     document.querySelector("span#Returning").innerText = tbodys[1].getElementsByTagName("tr").length
+      //     document.querySelector("span#Missing").innerText = '?'
+      // }, 500)
+  }
+  catch (error)
+  {
+      console.error(error)
+  }
+  finally
+  {
+      // document.querySelector('div#loading_circle').classList.remove('active');
+      AppCTRL.Bar.setProgressCircleStateWrapper("Done")
+  }
+}
+
+/**
+ * Adds children to the active table in the session.
+ *
+ * @param {Array} children_name - An array of children names to be added.
+ * @return {void}
+ */
+async function Session_active_table_add_children(children_name) {
+    AppCTRL.Bar.setProgressCircleStateWrapper('progress')
+    children_name = children_name.filter(child => child !== "unknown")
+    // const db = window.idb.wrap(window.db)
+    const obj = window.idb.transaction('children', 'readwrite').objectStore('children')
+    let active_table_existed_children = Session_from_active_table_get_listed_children_name();
+    // let active_table_body = Session_get_active_table()[0].getElementsByTagName("tbody")[0];
+    let new_detected_children =[]
+    if (active_table_existed_children.length > 0) {
+        for (let child of children_name) {
+            if (!active_table_existed_children.includes(child)) {
+                let child_data = await obj.get(child)
+                let child_raw = [child_data.Name, child_data.Class, child_data.Address]
+                console.log(child_data)
+                new_detected_children.push(createData(...child_raw))
+            }
+        }
+    }
+    else {
+        for (let child of children_name) {
+            if (!active_table_existed_children.includes(child)) {
+              let child_data = await obj.get(child)
+              let child_raw = [child_data.Name, child_data.Class, child_data.Address]
+              console.log(child_data)
+              new_detected_children.push(createData(...child_raw))
+            }
+        }
+    }
+
+    console.log(new_detected_children)
+    if(openGoing)
+    {
+      setGoing_list_wrapper([...Going_list, ...new_detected_children])
+    }
+    else if(openReturning) {
+      setReturning_list_wrapper([...Returning_list, ...new_detected_children])
+    }
+}
+
+/**
+ * Retrieves the listed children from the active table session.
+ *
+ * @return {Array} An array of the names of the listed children.
+ */
+function Session_from_active_table_get_listed_children_name() {
+    let listed_children=null
+    if(openGoing)
+    {
+      listed_children = Going_list
+    }
+    else if(openReturning)
+    {
+      listed_children = Returning_list
+    }
+    // listed_children = [...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active > div.collapsible-body >div > div.row.left-align > table > tbody > tr >td.child_name")].map(td_child_name => td_child_name.textContent)
+    // console.log(listed_children)
+    return listed_children.map(record => record.Name)
+}
+
   return (
     <div>
       <Stack
@@ -368,10 +504,19 @@ function Session_Actions_Export() {
           >
           <GroupAddIcon />
         </Fab>
-        <Fab disabled={!(openGoing || openReturning)} color="primary" aria-label="add" size="small">
+        <Fab disabled={!(openGoing || openReturning)} color="primary" aria-label="add" size="small"
+        onClick={()=>document.querySelector('#session_cam').click()}
+        >
           <AddAPhotoIcon />
         </Fab>
-        <Fab  disabled={/*!(( Going_count > 0 && openGoing ) || ( Returning_count>0 && openReturning ) )*/ Going_selected_count==0 && Returning_selected_count==0} color="primary" aria-label="add" size="small"
+          <input id="session_cam" type="file" multiple accept="image/*;capture=camera"  hidden={true} onChange={
+            async()=>
+            {
+              AppCTRL.Bar.setProgressCircleStateWrapper("progress")
+              Session_check_input_add(document.getElementById('session_cam'))
+            }
+          } />
+        <Fab disabled={/*!(( Going_count > 0 && openGoing ) || ( Returning_count>0 && openReturning ) )*/ Going_selected_count == 0 && Returning_selected_count == 0} color="primary" aria-label="add" size="small"
           onClick={function()
             {
               setGoing_list_wrapper(Going_list.filter(
@@ -473,6 +618,7 @@ function Session_Actions_Export() {
           <input type={"file"} id={"json_input"} class={ "hidden" } accept={ ".json,application/json" }
                 onchange={ (e)=>{console.log(e);Session_check_import_json(this)}}/>
         <ManualAddModal open={manualAdd} setOpen={setManualAdd} setGoing_list={setGoing_list_wrapper} setReturning_list={setReturning_list_wrapper} refGoing_list={refGoing_list} refReturning_list={refReturning_list} refOpenGoing={refOpenGoing} refOpenReturning={refOpenReturning}/>
+        <div id="fake_div"></div>
     </div>
   )
 }

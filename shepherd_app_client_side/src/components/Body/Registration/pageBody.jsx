@@ -9,6 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateField } from '@mui/x-date-pickers/DateField';
 // import {AppGlobalContext} from '../../../context';
+import {AppGlobalContext} from '../../../App';
 
 function Registration_page_body() {
     const [geoLocation, setGeoLocation] = React.useState();
@@ -18,7 +19,7 @@ function Registration_page_body() {
     const [personClass,setPersonClass] = React.useState();
     const [personBirthdate, setPersonBirthdate] = React.useState();
     const [activation, setActivation] = React.useState(true);
-    // const [AppGlobalContxt] = React.useContext(AppGlobalContext);
+    const AppGlobalContxt = React.useContext(AppGlobalContext);
     function set_location(position) {
         setGeoLocation(position.coords.latitude + ',' + position.coords.longitude)
     }
@@ -103,6 +104,8 @@ function Registration_page_body() {
                          <Grid item xs={12} >
                          <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
                              async () => {
+                                //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
+                                AppGlobalContxt.Bar.setProgressCircleStateWrapper('progress')
                                 /*debugging &*/ console.log("cam change called")
                                 let image;//, canvas;
                                 const container = document.getElementById("image_section")
@@ -116,6 +119,8 @@ function Registration_page_body() {
                                 //kakram:the following line needed to make the start of the allocated memory for this operation to be freed after finishing
                                 //please check the following issue for more details https://github.com/vladmandic/face-api/issues/25
                                 window.faceapi.tf.engine().startScope();
+                                console.log(AppGlobalContxt)
+                                console.log("start scope");
                                 await window.faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then(
                                     (event) =>
                                     {
@@ -130,6 +135,7 @@ function Registration_page_body() {
                                     () =>
                                     {
                                         window.faceapi.tf.engine().endScope();//kakram: to deallocate the memory selected in last scope
+                                            AppGlobalContxt.Bar.setProgressCircleStateWrapper('done')
                                         console.log('Experiment completed');
                                     }
                                   );
