@@ -33,7 +33,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import ManualAddModal from "../../Common_Components/manual_add_Modal/ManualAddModal";
 import { AppGlobalContext } from "../../../App";
 
-
+//FIXME: incase adding multi images doublicated faces added
 /**
  * Renders a nested list component with collapsible sections.
  *
@@ -166,29 +166,7 @@ export default function Session_page_body() {
   const [openReturning, setOpenReturning] = React.useState(false);
   const [openMissing, setOpenMissing] = React.useState(false);
   const [Going_count, setGoing_count] = React.useState(0);
-  const [Going_list, setGoing_list] = React.useState([
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Frozen yoghurt', 159, 6.0),
-    createData('Ice cream sandwich', 237, 9.0),
-    createData('Gingerbread', 356, 16.0)
-  ]);
+  const [Going_list, setGoing_list] = React.useState([]);
   
   //TODO: [implemented to be tested] hook updating counter once any change takes place to any of list
   
@@ -220,21 +198,24 @@ export default function Session_page_body() {
    * 
    * @description setGoing_list_wrapper that takes a parameter newState. It sets the value of Going_list to the newState and updates Going_count based on the length of newState.
    */
-  const setGoing_list_wrapper=(newState)=>{
-    setGoing_list(newState)
+  const setGoing_list_wrapper= async (newState)=>{
+    await setGoing_list(newState)
     // refGoing_list.current = newState
-    if(newState.length)setGoing_count(newState.length);
-  }
+    if(newState.length){await setGoing_count(newState.length);}
+    await Session_update_missing_table(newState.map(recored=>{return recored.cells[0]}),Returning_list.map(recored=>{return recored.cells[0]}));
+}
 
-  const setReturning_list_wrapper=(newState)=>{
-    setReturning_list(newState)
+  const setReturning_list_wrapper=async (newState)=>{
+    await setReturning_list(newState)
     // refReturning_list.current = newState
-    if(newState.length)setReturning_count(newState.length);
+    if(newState.length){await setReturning_count(newState.length);}
+    await Session_update_missing_table(Going_list.map(recored =>{return recored.cells[0]}),newState.map(recored =>{return recored.cells[0]}));
   }
 
   const setMissing_list_wrapper=(newState)=>{
     setMissing_list(newState)
     if(newState.length)setMissing_count(newState.length);
+    console.log(newState)
   }
   
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -348,12 +329,51 @@ function Session_Actions_Export() {
 }
 
 
+/**
+ * Retrieves the specified children from the 'children' store in the IndexedDB.
+ *
+ * @param {Array} children_array - An array of child keys to retrieve.
+ * @return {Array} An array of child objects matching the specified keys.
+ */
+async function Session_get_children(children_array) {
+  let result_children = [];
+  let cursor = await window.idb.transaction('children', 'readwrite').store.openCursor();
+
+  while (cursor) {
+    console.log(cursor.key, cursor.value);
+    if(children_array.includes(cursor.key)){
+      let record = cursor.value;
+      result_children.push({ ...record, Discriptor: new window.faceapi.LabeledFaceDescriptors(record.Discriptor._label, [new Float32Array(Discriptor_parser(record.Discriptor._descriptors[0]))]) })
+    }
+    cursor = await cursor.continue();
+  }
+  return result_children
+}
+
+
+function Session_get_missing(big_array, small_array) {
+
+  console.log(big_array)
+  console.log(small_array)
+  return big_array.filter(child => !small_array.includes(child))
+}
+
+async function Session_update_missing_table(Going_names, Returning_names)
+{
+  let missing_names        = await Session_get_missing(Going_names, Returning_names)
+  let missing_recoreds     = await Session_get_children(missing_names)
+  console.log(missing_recoreds)
+  let missing_data=missing_recoreds.map(record =>{return createData(...[record.Name,record.Class,record.Address])})
+  console.log(missing_data)
+  setMissing_list_wrapper(missing_data)
+}
+
 function Session_check_input_add(input) {
   console.log(input)
   if (input?.files?.length) {
       Session_detect_descriptors(input.files)
+      input.value='' //[kakram] to reset the input file to prevent redetection on same image
   }
-
 }
 
 async function get_all_recoded_discriptors()
@@ -399,6 +419,7 @@ async function Session_detect_descriptors(buffers) {
       found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
       console.log(found_children) //.map(child_data => child_data.toString()))
       Session_active_table_add_children(found_children.map(child => child._label))
+      AppCTRL.Bar.setProgressCircleStateWrapper("Done")
       // setTimeout(() => {
       //     tbodys = document.querySelectorAll('tbody')
       //     document.querySelector("span#Going").innerText = tbodys[0].getElementsByTagName("tr").length
@@ -409,11 +430,12 @@ async function Session_detect_descriptors(buffers) {
   catch (error)
   {
       console.error(error)
+      AppCTRL.Bar.setProgressCircleStateWrapper("Done")
   }
   finally
   {
       // document.querySelector('div#loading_circle').classList.remove('active');
-      AppCTRL.Bar.setProgressCircleStateWrapper("Done")
+      
   }
 }
 
