@@ -99,7 +99,7 @@ export default function CustomizedTable(props)
         // console.log(newSelected);
         setRows(newSelected);
     };
-
+    
     
 
     const handleChangePage = (event, newPage) => {
@@ -165,7 +165,7 @@ export function TableRecord(props) {
         }
         
         else
-        {
+            {
             toggled = {...props.data,selected:true}
             event.target.checked=true    
             props.setSelected_count(props.selected_count+1)
@@ -179,7 +179,7 @@ export function TableRecord(props) {
     },[props.data,props.selected_count,props.rows,props.selected]);
     // console.log(props.data )
     return (
-        <StyledTableRow key={props.data.cells[0]}>{
+        <StyledTableRow key={props.data.cells[0]} onClick={()=>console.log(props.data)}>{
             //.cells[0]
         }
         <StyledTableCell padding="checkbox">

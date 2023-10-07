@@ -4,22 +4,47 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MenuItem from '@mui/material/MenuItem';
 import CheckIcon from '@mui/icons-material/Check';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import MapIcon from '@mui/icons-material/Map';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateField } from '@mui/x-date-pickers/DateField';
 // import {AppGlobalContext} from '../../../context';
 import {AppGlobalContext} from '../../../App';
+import Switch from '@mui/material/Switch';
 
-function Registration_page_body() {
-    const [geoLocation, setGeoLocation] = React.useState();
-    const [personName, setPersonName] = React.useState();
-    const [personAddress, setPersonAddress] = React.useState();
-    const [personPhone, setPersonPhone] = React.useState();
-    const [personClass,setPersonClass] = React.useState();
-    const [personBirthdate, setPersonBirthdate] = React.useState();
+function Registration_page_body(props) {
+    const [geoLocation, setGeoLocation] = React.useState(props?.initial_record?.Location);
+    const [personName, setPersonName] = React.useState(props?.initial_record?.Name);
+    const [personAddress, setPersonAddress] = React.useState(props?.initial_record?.Address);
+    const [personPhone, setPersonPhone] = React.useState(props?.initial_record?.Telephone);
+    const [personClass,setPersonClass] = React.useState(props?.initial_record?.Class);
+    const [personBirthdate, setPersonBirthdate] = React.useState(props?.initial_record?.Birthdate);
     const [activation, setActivation] = React.useState(true);
+    const [editing,setEditing] = React.useState(props?.optional_editing);
+    const [editing_switch,setEditing_switch] = React.useState(props?.default_editing_option === "read_only");
     const AppGlobalContxt = React.useContext(AppGlobalContext);
+    const switch_render=(state)=>
+    {
+        if (state === "read only") {
+            return  <Grid item container >
+                        <Grid item xs={12}>
+                            <Typography>Child data</Typography>
+                        </Grid>
+                        <Grid>
+                            <Typography>Read only</Typography>
+                            <Switch checked={editing} />
+                            <Typography>Editable</Typography>
+                        </Grid>
+                    </Grid>
+        }
+        else
+        {
+            return // nothing
+        }
+    }
+
+
     function set_location(position) {
         setGeoLocation(position.coords.latitude + ',' + position.coords.longitude)
     }
@@ -33,6 +58,20 @@ function Registration_page_body() {
             console.log("Geolocation is not supported by this browser.")
         }
     }
+    function check_direction_on_map() {
+//TODO: enable and disable of all inputs and buttons depending on switch state
+//TODO: render map check related to props.default_editing_option
+
+
+        // document.querySelector("#Location").value
+        const ml = document.querySelector("#map_link")
+        const direction = geoLocation
+        ml.setAttribute("href", direction)
+        // trigger(ml,'click')
+        // ml.click()
+        window.open(direction)
+    }
+    
 
     function submit_registration()
     {
@@ -99,11 +138,19 @@ function Registration_page_body() {
                     alignItems: 'center',
                 }}
             >
-                <Box component="form"  sx={{ mt: 3 }}>
+                <Box component="form" sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
-                         <Grid item xs={12} >
-                         <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
-                             async () => {
+                            switch_render(props.default_editing_option)
+                           
+
+
+
+                            
+                        
+
+                        <Grid item xs={12} >
+                            <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
+                                async () => {
                                 //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
                                 AppGlobalContxt.Bar.setProgressCircleStateWrapper('progress')
                                 /*debugging &*/ console.log("cam change called")
@@ -291,19 +338,24 @@ function Registration_page_body() {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                    <Fab color="primary" aria-label="Submit" size="small"  sx={{ mt: 3, mb: 2 }}
-                    margin='none' onClick={() =>fill_with_current_location()} >
-                    <MyLocationIcon/>
-                    </Fab>
-                    </Grid>                   
+                            <Fab color="primary" aria-label="Submit" size="small" sx={{ mt: 3, mb: 2 }}
+                                margin='none' onClick={() => fill_with_current_location()} >
+                                <MyLocationIcon />
+                            </Fab>
+                            <Fab color="primary" aria-label="CheckLocationGoogleMap" size="small" sx={{ mt: 3, mb: 2 }}
+                                margin='none' onClick={() => check_direction_on_map()} >
+                                <MapIcon />
+                            </Fab>
+                        </Grid>
                     </Grid>
-                    <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={()=>submit_registration()}>
-                        
-                    <CheckIcon/>
-                    Submit
+                    <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={() => submit_registration()}>
+
+                        <CheckIcon />
+                        Submit
                     </Fab>
                 </Box>
             </Box>
+            <a href="" id="map_link" hidden={true} target="_blank"></a>
             <div class="row" id="image_section"></div>
         </Container>
     );

@@ -82,6 +82,32 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+/**
+ * Renders a custom app bar component.
+ *
+ * @startuml
+ * 
+ * class CustomAppBar {
+ *   - anchorEl: React.useState
+ *   - mobileMoreAnchorEl: React.useState
+ *   - isMenuOpen: Boolean
+ *   - isMobileMenuOpen: Boolean
+ *   + handleProfileMenuOpen(event: Event): void
+ *   + handleMobileMenuClose(): void
+ *   + handleMenuClose(): void
+ *   + handleMobileMenuOpen(event: Event): void
+ *   - menuId: string
+ *   - renderMenu: JSX.Element
+ *   - query: React.useState
+ *   - mobileMenuId: string
+ *   - renderMobileMenu: JSX.Element
+ * }
+ * 
+ * @enduml
+ * 
+ * @param {Object} props - The props object containing the component's properties.
+ * @return {JSX.Element} The rendered custom app bar component.
+ */
 export default function CustomAppBar(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -205,6 +231,9 @@ export default function CustomAppBar(props) {
             {props.title}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'flex', md: 'flex' } }}>
+           { progressCircle( props.progressCircleState)}
+          </Box>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>{/*TODO : enable notification and profile */}
             <IconButton size="large" aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="error">
@@ -231,9 +260,6 @@ export default function CustomAppBar(props) {
             >
               <AccountCircle />
             </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-           { progressCircle( props.progressCircleState)}
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton

@@ -1,78 +1,32 @@
 import React from 'react';
 import { Box, Button, Container, CssBaseline, Grid, TextField, Typography } from '@mui/material';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import CustomizedTable, { createData } from '../../Common_Components/List_Table/list_table';
+import { get_all_recorded_rows } from '../../../db';
+function Registed_page_body(props) {
+  const [rows, setRows] = React.useState(window.all_registed_childrens.map((data) => createData(...[ data.Name, data.Class, data.Address ])));
+  const [selected_count, setSelected_count] = React.useState(0);
 
-function Registed_page_body() {
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        <Box component="form" noValidate sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign Up
-          </Button>
-        </Box>
-      </Box>
-    </Container>
-  );
+    <Grid container>
+      <Grid item xs={12}>
+      <CustomizedTable 
+        header_cells={[
+                "Name",
+                "Class",
+                "Address"
+              ]} 
+        columns_align={['left','right','right']}
+        rows={rows}
+        setRows={setRows}
+        selected_count={selected_count}
+        setSelected_count={setSelected_count} />
+      </Grid>
+    </Grid>
+  )
 }
 
 export default Registed_page_body;

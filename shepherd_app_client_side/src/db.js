@@ -1,5 +1,5 @@
 import {wrap,openDB} from 'idb'
-
+import { createData } from './components/Common_Components/List_Table/list_table'
 function refresh_all_registed_childrens() {
     let myreq = window.db.transaction(["children"], "readwrite").objectStore("children").getAll()
     // myreq.onerror = (event) => M.toast({ html: event });
@@ -42,5 +42,29 @@ async function open_db(db_name) {
     })
 
 }
+function Discriptor_parser(Discriptor) {
+  let a = []
+  for (let i in Discriptor) {
+      a.push(Discriptor[i])
+  }//if(typeof(Discriptor)!=)
+  return a
+}
 
-export {open_db}
+async function get_all_recoded_discriptors()
+{
+  
+  const obj = window.idb.transaction('children', 'readwrite').objectStore('children')
+  let records = await obj.getAll()
+  records = records.map(record => { return { ...record, Discriptor: new window.faceapi.LabeledFaceDescriptors(record.Discriptor._label, [new Float32Array(Discriptor_parser(record.Discriptor._descriptors[0]))]) } })
+  return records
+
+}
+
+async function get_all_recorded_rows()
+{
+  const obj = window.idb.transaction('children', 'readwrite').objectStore('children')
+  let records = await obj.getAll()
+  return records.map(record => createData(...[record.Name,record.Class,record.Address]))
+}
+
+export {open_db,get_all_recoded_discriptors,get_all_recorded_rows}

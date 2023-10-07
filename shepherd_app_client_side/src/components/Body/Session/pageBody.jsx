@@ -200,22 +200,20 @@ export default function Session_page_body() {
    */
   const setGoing_list_wrapper= async (newState)=>{
     await setGoing_list(newState)
-    // refGoing_list.current = newState
-    if(newState.length){await setGoing_count(newState.length);}
+    console.log(newState.Length)
+    await setGoing_count(newState.length);
     await Session_update_missing_table(newState.map(recored=>{return recored.cells[0]}),Returning_list.map(recored=>{return recored.cells[0]}));
 }
 
   const setReturning_list_wrapper=async (newState)=>{
     await setReturning_list(newState)
-    // refReturning_list.current = newState
-    if(newState.length){await setReturning_count(newState.length);}
+    await setReturning_count(newState.length);
     await Session_update_missing_table(Going_list.map(recored =>{return recored.cells[0]}),newState.map(recored =>{return recored.cells[0]}));
   }
 
   const setMissing_list_wrapper=(newState)=>{
     setMissing_list(newState)
-    if(newState.length)setMissing_count(newState.length);
-    console.log(newState)
+    setMissing_count(newState.length);
   }
   
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -340,7 +338,6 @@ async function Session_get_children(children_array) {
   let cursor = await window.idb.transaction('children', 'readwrite').store.openCursor();
 
   while (cursor) {
-    console.log(cursor.key, cursor.value);
     if(children_array.includes(cursor.key)){
       let record = cursor.value;
       result_children.push({ ...record, Discriptor: new window.faceapi.LabeledFaceDescriptors(record.Discriptor._label, [new Float32Array(Discriptor_parser(record.Discriptor._descriptors[0]))]) })
@@ -352,20 +349,32 @@ async function Session_get_children(children_array) {
 
 
 function Session_get_missing(big_array, small_array) {
-
-  console.log(big_array)
-  console.log(small_array)
-  return big_array.filter(child => !small_array.includes(child))
+  if (big_array.length ===0 && small_array.length ===0)
+  {
+    return []
+  }
+  else
+  {
+    return big_array.filter(child => !small_array.includes(child))
+  }
 }
 
 async function Session_update_missing_table(Going_names, Returning_names)
 {
-  let missing_names        = await Session_get_missing(Going_names, Returning_names)
-  let missing_recoreds     = await Session_get_children(missing_names)
-  console.log(missing_recoreds)
-  let missing_data=missing_recoreds.map(record =>{return createData(...[record.Name,record.Class,record.Address])})
-  console.log(missing_data)
-  setMissing_list_wrapper(missing_data)
+  console.log(Going_names.length, Returning_names.length)
+  if (Going_names.length === 0 && Returning_names.length === 0)
+  {
+    console.log("no missing")
+    setMissing_list_wrapper([])
+  }
+  else
+  {
+    let missing_names = await Session_get_missing(Going_names, Returning_names)
+    console.log(missing_names)
+    let missing_recoreds = await Session_get_children(missing_names)
+    let missing_data = missing_recoreds.map(record => { return createData(...[record.Name, record.Class, record.Address]) })
+    setMissing_list_wrapper(missing_data)
+  }
 }
 
 function Session_check_input_add(input) {
@@ -407,17 +416,12 @@ async function Session_detect_descriptors(buffers) {
       for (let image of detected_descriotor_arr) {
           Window.Session_detect_descriptors_result.push(await window.faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors())
       }
-      console.log(Window.Session_detect_descriptors_result)
       const descriptors_arrs = Window.Session_detect_descriptors_result.flat()
-      console.log(descriptors_arrs)
       let all_recoded_children = await get_all_recoded_discriptors()
-      console.log(all_recoded_children)
       let registed_d = all_recoded_children.map(record => { return record.Discriptor })
-      console.log(registed_d)
       let faceMatcher = new window.faceapi.FaceMatcher(registed_d, 0.6)
       let found_children = null
       found_children = descriptors_arrs.map(d => faceMatcher.findBestMatch(d.descriptor))
-      console.log(found_children) //.map(child_data => child_data.toString()))
       Session_active_table_add_children(found_children.map(child => child._label))
       AppCTRL.Bar.setProgressCircleStateWrapper("Done")
       // setTimeout(() => {
@@ -448,10 +452,8 @@ async function Session_detect_descriptors(buffers) {
 async function Session_active_table_add_children(children_name) {
     AppCTRL.Bar.setProgressCircleStateWrapper('progress')
     children_name = children_name.filter(child => child !== "unknown")
-    // const db = window.idb.wrap(window.db)
     const obj = window.idb.transaction('children', 'readwrite').objectStore('children')
     let active_table_existed_children = Session_from_active_table_get_listed_children_name();
-    // let active_table_body = Session_get_active_table()[0].getElementsByTagName("tbody")[0];
     let new_detected_children =[]
     if (active_table_existed_children.length > 0) {
         for (let child of children_name) {
@@ -499,8 +501,6 @@ function Session_from_active_table_get_listed_children_name() {
     {
       listed_children = Returning_list
     }
-    // listed_children = [...document.querySelectorAll("#main_content > div > ul > li.collapsible_li_table.active > div.collapsible-body >div > div.row.left-align > table > tbody > tr >td.child_name")].map(td_child_name => td_child_name.textContent)
-    // console.log(listed_children)
     return listed_children.map(record => record.Name)
 }
 
@@ -539,14 +539,16 @@ function Session_from_active_table_get_listed_children_name() {
             }
           } />
         <Fab disabled={/*!(( Going_count > 0 && openGoing ) || ( Returning_count>0 && openReturning ) )*/ Going_selected_count == 0 && Returning_selected_count == 0} color="primary" aria-label="add" size="small"
-          onClick={function()
+          onClick={async function()
             {
-              setGoing_list_wrapper(Going_list.filter(
+              // FIXME:[kakram](Minor bug)(reversable) when clear both list in session missing never clear due setter racing fixed 
+              await setGoing_list_wrapper(Going_list.filter(
                 (record)=>!record.selected
               ))
-              setReturning_list_wrapper(Returning_list.filter(
+              await setReturning_list_wrapper(Returning_list.filter(
                 (record)=>!record.selected
               ))
+              await Session_update_missing_table(Going_list.map(recored =>{return recored.cells[0]}),Returning_list.map(recored =>{return recored.cells[0]}));
             }}
         >
           <GroupRemoveIcon />
