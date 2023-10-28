@@ -6,7 +6,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CustomizedTable, { createData } from '../../Common_Components/List_Table/list_table';
 import { get_all_recorded_rows } from '../../../db';
-function Registed_page_body(props) {
+function Registed_page_body(props)
+{
   const [rows, setRows] = React.useState(window.all_registed_childrens.map((data) => createData(...[ data.Name, data.Class, data.Address ])));
   const [selected_count, setSelected_count] = React.useState(0);
 

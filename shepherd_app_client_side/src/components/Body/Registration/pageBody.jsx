@@ -140,7 +140,7 @@ function Registration_page_body(props) {
             >
                 <Box component="form" sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
-                            switch_render(props.default_editing_option)
+                            {switch_render(props.default_editing_option)}
                            
 
 
