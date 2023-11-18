@@ -9,6 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import theme from '../../../theme'
 import { Checkbox, Typography } from '@mui/material';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import {useSignle} from '@preact/signals'
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -78,11 +82,17 @@ export default function CustomizedTable(props)
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const { onSelectAllClick, numSelected, rowCount, onRequestSort,rows,setRows } = props;
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    
+
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
+    const table_ref=React.useRef(null)
 
     const handleSelectAllClick = () => {
         let newSelected
@@ -118,7 +128,7 @@ export default function CustomizedTable(props)
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
     return (
-        <TableContainer component={Paper} style={{ width: 'auto', margin: '10px', alignContent: 'center' }}>
+        <TableContainer origin={"indexedDB.sefain_brain.children"} ref={table_ref} component={Paper} style={{ width: 'auto', margin: '10px', alignContent: 'center' }}>
             <Table aria-label="customized table">
                 <TableHead>
                     <TableRow>
@@ -135,28 +145,62 @@ export default function CustomizedTable(props)
                             />
                         </StyledTableCell>
                         {
-                           props.header_cells.map((cell_text,cell_index)=><StyledTableCell align={props.columns_align[cell_index]}>{cell_text/*.replace(' ','&nbsp;')*/}</StyledTableCell>)
+                            props.header_cells.map((cell_text,cell_index)=><StyledTableCell align={props.columns_align[cell_index]}>{cell_text/*.replace(' ','&nbsp;')*/}</StyledTableCell>)
                         }
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {
                         props.rows.map(
-                            (row) =><TableRecord align={props.columns_align} data={row} rows={props.rows} setRows={props.setRows} selected_count={props.selected_count} setSelected_count={props.setSelected_count}/>
+                            (row) =><TableRecord 
+                                        parent_table={table_ref}
+                                        align={props.columns_align}
+                                        data={row}
+                                        rows={props.rows}
+                                        setRows={props.setRows}
+                                        selected_count={props.selected_count}
+                                        setSelected_count={props.setSelected_count}
+                                        open={open}
+                                        setOpen={setOpen}
+                                        handleOpen={handleOpen}
+                                        handleClose={handleClose}/>
                         )
                     }
                 </TableBody>
             </Table>
+        <RecordModal open={open} setOpen={setOpen} handleOpen={handleOpen} handleClose={handleClose}/>
         </TableContainer>
     );
 }
 
 
 export function TableRecord(props) {
+    let touchtime=0;
+    const row_click_handler = (event) =>{
+        if (touchtime === 0) {
+            // set first click
+            console.log("first click")
+            console.log(props.data)
+            touchtime = new Date().getTime();
+        } else {
+            // compare first click to this click and see if they occurred within double click threshold
+            if (((new Date().getTime()) - touchtime) < 800) {
+                // double click occurred
+                console.log("double clicked");
+                window.recordname=props.data.cells[0]
+                props.handleOpen()
+                // show_child_data(event.target.parentElement.childNodes[0].innerText)
+                touchtime = 0;
+            } else {
+                // not a double click so set as a new first click
+                touchtime = new Date().getTime();
+            }
+        }
+    }
+
     const handleClick = React.useCallback((event) =>{
         let toggled ={}
         // console.log(event.target.checked)
-
         if (props.data.selected)
         {
             toggled = {...props.data,selected:false}
@@ -165,7 +209,7 @@ export function TableRecord(props) {
         }
         
         else
-            {
+        {
             toggled = {...props.data,selected:true}
             event.target.checked=true    
             props.setSelected_count(props.selected_count+1)
@@ -179,7 +223,7 @@ export function TableRecord(props) {
     },[props.data,props.selected_count,props.rows,props.selected]);
     // console.log(props.data )
     return (
-        <StyledTableRow key={props.data.cells[0]} onClick={()=>console.log(props.data)}>{
+        <StyledTableRow key={props.data.cells[0]} onClick={row_click_handler}>{
             //.cells[0]
         }
         <StyledTableCell padding="checkbox">
@@ -194,5 +238,38 @@ export function TableRecord(props) {
         }
 
     </StyledTableRow>
-)
+    )
+}
+
+export function RecordModal(props) {
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+    };
+    
+    
+    return (
+        <Modal
+            open={props.open}
+            onClose={props.handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+                Text in a modal
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                {window.recordname}
+            </Typography>
+            </Box>
+        </Modal>
+    );
 }

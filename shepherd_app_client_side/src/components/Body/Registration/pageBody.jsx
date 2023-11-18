@@ -141,13 +141,6 @@ function Registration_page_body(props) {
                 <Box component="form" sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
                             {switch_render(props.default_editing_option)}
-                           
-
-
-
-                            
-                        
-
                         <Grid item xs={12} >
                             <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
                                 async () => {
@@ -185,16 +178,16 @@ function Registration_page_body(props) {
                                             AppGlobalContxt.Bar.setProgressCircleStateWrapper('done')
                                         console.log('Experiment completed');
                                     }
-                                  );
+                                );
                             }
-                         }/>
-                         <Fab color="primary" aria-label="add" size="medium"
-                         onClick={()=>document.querySelector('#registration_cam').click()}
-                         >
+                        }/>
+                        <Fab color="primary" aria-label="add" size="medium"
+                        onClick={()=>document.querySelector('#registration_cam').click()}
+                        >
                             <PhotoCameraIcon/>
-                         </Fab>
-                         </Grid>
-                       <Grid item xs={12} >
+                        </Fab>
+                        </Grid>
+                    <Grid item xs={12} >
                             <TextField
                                 autoComplete="name"
                                 name="Name"
@@ -282,7 +275,7 @@ function Registration_page_body(props) {
                                 }
                             />
                             {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                              <DatePicker
+                                <DatePicker
                                 required
                                 type='date'
                                 defaultValue=""
@@ -301,7 +294,7 @@ function Registration_page_body(props) {
                                         setPersonBirthdate(e.target.value)
                                     }
                                 }
-                              />
+                                />
                             </LocalizationProvider> */}
                         </Grid>
                         <Grid item xs={12}>
