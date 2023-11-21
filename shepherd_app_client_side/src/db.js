@@ -82,15 +82,15 @@ async function get_all_recoded_children() {
     }
 }
 
-async function get_record(key,origin="indexedDB.sefain_brain.children", callback) {
+async function get_record(key,origin="indexedDB.sefain_brain.children"/*, callback*/) {
     origin=origin.split(".");
     if (origin[0] == "indexedDB")
     {
         try {
             const myidb = window.idb//.wrap(await open_db("sefain_brain"))
-            const ob = myidb.transaction([origin[0]], 'readwrite').objectStore(origin[0])
+            const ob = myidb.transaction(['children'], 'readwrite').objectStore('children')
             let request = await ob.get(key)
-            callback(request)
+            // callback(request)
             return request
         }
         catch (any) {
@@ -100,4 +100,11 @@ async function get_record(key,origin="indexedDB.sefain_brain.children", callback
 }
 
 
-export {open_db,get_all_recoded_discriptors,get_all_recorded_rows,get_all_recoded_children_names,get_all_recoded_children}
+export {
+    open_db,
+    get_record,
+    get_all_recoded_discriptors,
+    get_all_recorded_rows,
+    get_all_recoded_children_names,
+    get_all_recoded_children
+}

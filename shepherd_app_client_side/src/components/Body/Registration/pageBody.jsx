@@ -14,6 +14,7 @@ import {AppGlobalContext} from '../../../App';
 import Switch from '@mui/material/Switch';
 
 function Registration_page_body(props) {
+    console.log(props.initial_record)
     const [geoLocation, setGeoLocation] = React.useState(props?.initial_record?.Location);
     const [personName, setPersonName] = React.useState(props?.initial_record?.Name);
     const [personAddress, setPersonAddress] = React.useState(props?.initial_record?.Address);
@@ -26,14 +27,19 @@ function Registration_page_body(props) {
     const AppGlobalContxt = React.useContext(AppGlobalContext);
     const switch_render=(state)=>
     {
-        if (state === "read only") {
+        console.log(state)
+        if (state === "read_only") {
             return  <Grid item container >
-                        <Grid item xs={12}>
-                            <Typography>Child data</Typography>
+                        <Grid item xs={12} style={{ textAlign: "center" }}>
+                            <Typography variant="h5" >Child data</Typography>
                         </Grid>
-                        <Grid>
+                        <Grid item xs={4} style={{ textAlign: "center" }}>
                             <Typography>Read only</Typography>
-                            <Switch checked={editing} />
+                        </Grid>
+                        <Grid item xs={4} style={{ textAlign: "center" }}>
+                            <Switch checked={editing} onChange={() => setEditing(!editing)} />
+                        </Grid>
+                        <Grid item xs={4} style={{ textAlign: "center" }}>
                             <Typography>Editable</Typography>
                         </Grid>
                     </Grid>
@@ -66,10 +72,10 @@ function Registration_page_body(props) {
         // document.querySelector("#Location").value
         const ml = document.querySelector("#map_link")
         const direction = geoLocation
-        ml.setAttribute("href", direction)
+        ml.setAttribute("href", "https://www.google.com/maps/dir//" + direction)
         // trigger(ml,'click')
         // ml.click()
-        window.open(direction)
+        window.open("https://www.google.com/maps/dir//" +direction)
     }
     
 
@@ -131,7 +137,7 @@ function Registration_page_body(props) {
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <Box
-                sx={{
+                style={{
                     // marginTop: 8,
                     display: 'flex',
                     flexDirection: 'column',
@@ -141,7 +147,7 @@ function Registration_page_body(props) {
                 <Box component="form" sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
                             {switch_render(props.default_editing_option)}
-                        <Grid item xs={12} >
+                        <Grid item xs={12} style={{ textAlign: "center" }} >
                             <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
                                 async () => {
                                 //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
@@ -330,22 +336,25 @@ function Registration_page_body(props) {
                                 onChange={(e)=>setGeoLocation(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} style={{ textAlign: "center" }}>
                             <Fab color="primary" aria-label="Submit" size="small" sx={{ mt: 3, mb: 2 }}
                                 margin='none' onClick={() => fill_with_current_location()} >
                                 <MyLocationIcon />
                             </Fab>
+                            <span>  </span>
                             <Fab color="primary" aria-label="CheckLocationGoogleMap" size="small" sx={{ mt: 3, mb: 2 }}
                                 margin='none' onClick={() => check_direction_on_map()} >
                                 <MapIcon />
                             </Fab>
                         </Grid>
                     </Grid>
+                    <Grid item xs={12} style={{ textAlign: "center" }}>
                     <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={() => submit_registration()}>
 
                         <CheckIcon />
                         Submit
                     </Fab>
+                    </Grid>
                 </Box>
             </Box>
             <a href="" id="map_link" hidden={true} target="_blank"></a>

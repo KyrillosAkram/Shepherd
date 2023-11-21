@@ -13,6 +13,8 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import {useSignle} from '@preact/signals'
+import {get_record} from '../../../db'
+import Registration_page_body from '../../Body/Registration/pageBody'
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -176,7 +178,7 @@ export default function CustomizedTable(props)
 
 export function TableRecord(props) {
     let touchtime=0;
-    const row_click_handler = (event) =>{
+    const row_click_handler = async (event) =>{
         if (touchtime === 0) {
             // set first click
             console.log("first click")
@@ -187,7 +189,8 @@ export function TableRecord(props) {
             if (((new Date().getTime()) - touchtime) < 800) {
                 // double click occurred
                 console.log("double clicked");
-                window.recordname=props.data.cells[0]
+                // window.recordname=props.data.cells[0]
+                window.record=await get_record(props.data.cells[0])
                 props.handleOpen()
                 // show_child_data(event.target.parentElement.childNodes[0].innerText)
                 touchtime = 0;
@@ -218,7 +221,6 @@ export function TableRecord(props) {
         new_rows[props.rows.indexOf(props.data)]=toggled
         props.setRows(new_rows.map((e)=>{return e}))
         // console.log(props.data)
-
         // setSelected(newSelected);
     },[props.data,props.selected_count,props.rows,props.selected]);
     // console.log(props.data )
@@ -236,7 +238,6 @@ export function TableRecord(props) {
         {
             props.data.cells.map((cell_text,cell_index)=><StyledTableCell align={props.align[cell_index]}>{cell_text  }</StyledTableCell>)
         }
-
     </StyledTableRow>
     )
 }
@@ -249,9 +250,12 @@ export function RecordModal(props) {
         transform: 'translate(-50%, -50%)',
         width: 400,
         bgcolor: 'background.paper',
-        border: '2px solid #000',
+        // border: '2px solid #000',
         boxShadow: 24,
         p: 4,
+        display: 'flex',
+        borderRadius:"10px",
+
     };
     
     
@@ -262,13 +266,17 @@ export function RecordModal(props) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box sx={style}>
+ {/*            <Box sx={style}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
                 Text in a modal
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 {window.recordname}
             </Typography>
+             </Box>
+            */}
+            <Box sx={style}>
+                <Registration_page_body optional_editing={false} default_editing_option={"read_only"} initial_record={window.record} />
             </Box>
         </Modal>
     );

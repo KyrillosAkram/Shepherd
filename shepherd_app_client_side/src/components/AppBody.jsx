@@ -35,7 +35,7 @@ export default function AppBody(props) {
           <Registed_page_body />
         </TabPanel>
         <TabPanel value="Registration">
-          <Registration_page_body optional_editing={true} default_editing_option={"read_only"} initial_record={undefined}/>
+          <Registration_page_body optional_editing={true} default_editing_option={""} initial_record={undefined}/>
         </TabPanel>
       </TabContext>
       {/* <CustomizedSnackbars/> */}
