@@ -1,6 +1,7 @@
 import {wrap,openDB} from 'idb'
 import { createData } from './components/Common_Components/List_Table/list_table'
-function refresh_all_registed_childrens() {
+function refresh_all_registed_childrens()
+{
     let myreq = window.db.transaction(["children"], "readwrite").objectStore("children").getAll()
     // myreq.onerror = (event) => M.toast({ html: event });
     myreq.onsuccess = () => {
@@ -15,7 +16,8 @@ function refresh_all_registed_childrens() {
 }
 
 
-async function open_db(db_name) {
+async function open_db(db_name)
+{
     let request = window.indexedDB.open("sefain_brain", 1);
     return new Promise((resolve, reject) => {
         request.onupgradeneeded = (event) => {
@@ -41,7 +43,8 @@ async function open_db(db_name) {
     })
 
 }
-function Discriptor_parser(Discriptor) {
+function Discriptor_parser(Discriptor)
+{
     let a = []
     for (let i in Discriptor) {
         a.push(Discriptor[i])
@@ -63,14 +66,16 @@ async function get_all_recorded_rows()
     let records = await obj.getAll()
     records.map(record => createData(...[record.Name,record.Class,record.Address]))
 }
-async function get_all_recoded_children_names() {
+async function get_all_recoded_children_names()
+{
     const myidb = window.idb//.wrap(await open_db("sefain_brain"))
     const tx = myidb.transaction(['children'], 'readwrite')
     const ob = tx.objectStore('children')
     return [...await ob.getAll()].map(record => record.Name)
 }
 
-async function get_all_recoded_children() {
+async function get_all_recoded_children()
+{
     try {
         const myidb = window.idb//.wrap(await open_db("sefain_brain"))
         const ob = myidb.transaction(['children'], 'readwrite').objectStore('children')
@@ -82,9 +87,10 @@ async function get_all_recoded_children() {
     }
 }
 
-async function get_record(key,origin="indexedDB.sefain_brain.children"/*, callback*/) {
+async function get_record(key,origin="indexedDB.sefain_brain.children"/*, callback*/)
+{
     origin=origin.split(".");
-    if (origin[0] == "indexedDB")
+    if (origin[0] === "indexedDB")
     {
         try {
             const myidb = window.idb//.wrap(await open_db("sefain_brain"))
@@ -99,10 +105,47 @@ async function get_record(key,origin="indexedDB.sefain_brain.children"/*, callba
     }
 }
 
+async function delete_record(key,origin="indexedDB.sefain_brain.children")
+{
+    console.log(key)    
+    origin=origin.split(".");
+    if (origin[0] === "indexedDB")
+    {
+        try {
+            const myidb = window.idb//.wrap(await open_db("sefain_brain"))
+            const ob = myidb.transaction(['children'], 'readwrite').objectStore('children')
+            let request = await ob.delete(key)
+            return request
+        }
+        catch (any) {
+            console.error(any)
+        }
+    }
+}
+
+async function update_record(key, record,origin="indexedDB.sefain_brain.children")
+{
+    console.log(key)
+    origin=origin.split(".");
+    if (origin[0] === "indexedDB")
+    {
+        try {
+            const myidb = window.idb//.wrap(await open_db("sefain_brain"))
+            const ob = myidb.transaction(['children'], 'readwrite').objectStore('children')
+            let request = await ob.put(record)
+            return request
+        }
+        catch (any) {
+            console.error(any)
+        }
+    }
+}
 
 export {
     open_db,
     get_record,
+    delete_record,
+    update_record,
     get_all_recoded_discriptors,
     get_all_recorded_rows,
     get_all_recoded_children_names,

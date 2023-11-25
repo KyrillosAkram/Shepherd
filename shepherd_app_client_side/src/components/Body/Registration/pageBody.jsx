@@ -3,6 +3,8 @@ import { Box, Button, Container, CssBaseline, Grid, TextField, Typography ,Fab,I
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import MenuItem from '@mui/material/MenuItem';
 import CheckIcon from '@mui/icons-material/Check';
+import SaveIcon from '@mui/icons-material/Save';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import MapIcon from '@mui/icons-material/Map';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -12,6 +14,7 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 // import {AppGlobalContext} from '../../../context';
 import {AppGlobalContext} from '../../../App';
 import Switch from '@mui/material/Switch';
+import {delete_record,update_record} from '../../../db';
 
 function Registration_page_body(props) {
     console.log(props.initial_record)
@@ -52,7 +55,12 @@ function Registration_page_body(props) {
 
 
     function set_location(position) {
-        setGeoLocation(position.coords.latitude + ',' + position.coords.longitude)
+        const new_position=position.coords.latitude + ',' + position.coords.longitude
+        setGeoLocation(new_position)
+        if(geoLocation!==new_position)
+        {
+            setActivation(false)
+        }
     }
     async function fill_with_current_location() {
         // console.log(AppGlobalContxt)
@@ -146,54 +154,53 @@ function Registration_page_body(props) {
             >
                 <Box component="form" sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
-                            {switch_render(props.default_editing_option)}
+                        {switch_render(props.default_editing_option)}
                         <Grid item xs={12} style={{ textAlign: "center" }} >
                             <input id="registration_cam" type="file" accept="image/*;capture=camera" hidden={true} onChange={
                                 async () => {
-                                //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
-                                AppGlobalContxt.Bar.setProgressCircleStateWrapper('progress')
+                                    //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
+                                    AppGlobalContxt.Bar.setProgressCircleStateWrapper('progress')
                                 /*debugging &*/ console.log("cam change called")
-                                let image;//, canvas;
-                                const container = document.getElementById("image_section")
-                                if (image) image.remove()
-                                // if (canvas) canvas.remove()
-                                image = await window.faceapi.bufferToImage(document.getElementById("registration_cam").files[0])
-                                image.style.height = 'auto'
-                                image.style.width = `${document.querySelector('input#Name').clientWidth}px`
-                    
-                                container.append(image)
-                                //kakram:the following line needed to make the start of the allocated memory for this operation to be freed after finishing
-                                //please check the following issue for more details https://github.com/vladmandic/face-api/issues/25
-                                window.faceapi.tf.engine().startScope();
-                                console.log(AppGlobalContxt)
-                                console.log("start scope");
-                                await window.faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then(
-                                    (event) =>
-                                    {
-                                        console.log(event)
-                                        window.registration_discriptor = { ...event }
+                                    let image;//, canvas;
+                                    const container = document.getElementById("image_section")
+                                    if (image) image.remove()
+                                    // if (canvas) canvas.remove()
+                                    image = await window.faceapi.bufferToImage(document.getElementById("registration_cam").files[0])
+                                    image.style.height = 'auto'
+                                    image.style.width = `${document.querySelector('input#Name').clientWidth}px`
+
+                                    container.append(image)
+                                    //kakram:the following line needed to make the start of the allocated memory for this operation to be freed after finishing
+                                    //please check the following issue for more details https://github.com/vladmandic/face-api/issues/25
+                                    window.faceapi.tf.engine().startScope();
+                                    console.log(AppGlobalContxt)
+                                    console.log("start scope");
+                                    await window.faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then(
+                                        (event) => {
+                                            console.log(event)
+                                            window.registration_discriptor = { ...event }
                                         /*debugging &*/ console.log("remove disable");
-                                        setActivation(false)
-                                    }
-                                ).catch(
-                                    (e)=>console.log(e)
-                                ).finally(
-                                    () =>
-                                    {
-                                        window.faceapi.tf.engine().endScope();//kakram: to deallocate the memory selected in last scope
+                                            setActivation(false)
+                                        }
+                                    ).catch(
+                                        (e) => console.log(e)
+                                    ).finally(
+                                        () => {
+                                            window.faceapi.tf.engine().endScope();//kakram: to deallocate the memory selected in last scope
                                             AppGlobalContxt.Bar.setProgressCircleStateWrapper('done')
-                                        console.log('Experiment completed');
-                                    }
-                                );
-                            }
-                        }/>
-                        <Fab color="primary" aria-label="add" size="medium"
-                        onClick={()=>document.querySelector('#registration_cam').click()}
-                        >
-                            <PhotoCameraIcon/>
-                        </Fab>
+                                            console.log('Experiment completed');
+                                        }
+                                    );
+                                }
+                            } />
+                            <Fab color="primary" aria-label="add" size="medium"
+                                onClick={() => document.querySelector('#registration_cam').click()}
+                                disabled={props?.default_editing_option === "read_only"}
+                            >
+                                <PhotoCameraIcon />
+                            </Fab>
                         </Grid>
-                    <Grid item xs={12} >
+                        <Grid item xs={12} >
                             <TextField
                                 autoComplete="name"
                                 name="Name"
@@ -209,8 +216,12 @@ function Registration_page_body(props) {
                                 onChange={
                                     (e) => {
                                         setPersonName(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Name !== e.target.value) {
+                                            setActivation(false)
+                                        }
                                     }
                                 }
+                                disabled={!editing}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -227,8 +238,12 @@ function Registration_page_body(props) {
                                 onChange={
                                     (e) => {
                                         setPersonAddress(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Address !== e.target.value) {
+                                            setActivation(false)
+                                        }
                                     }
                                 }
+                                disabled={!editing}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -245,10 +260,14 @@ function Registration_page_body(props) {
                                 onChange={
                                     (e) => {
                                         setPersonClass(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Class !== e.target.value) {
+                                            setActivation(false)
+                                        }
                                     }
                                 }
+                                disabled={!editing}
                             >
-                                
+
                                 <MenuItem key={0} value={0}>0</MenuItem>
                                 <MenuItem key={1} value={1}>1</MenuItem>
                                 <MenuItem key={2} value={2}>2</MenuItem>
@@ -256,7 +275,7 @@ function Registration_page_body(props) {
                                 <MenuItem key={4} value={4}>4</MenuItem>
                                 <MenuItem key={5} value={5}>5</MenuItem>
                                 <MenuItem key={6} value={6}>6</MenuItem>
-                                
+
                             </TextField>
                         </Grid>
                         <Grid item xs={12}>
@@ -277,8 +296,12 @@ function Registration_page_body(props) {
                                 onChange={
                                     (e) => {
                                         setPersonBirthdate(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Birthdate !== e.target.value) {
+                                            setActivation(false)
+                                        }
                                     }
                                 }
+                                disabled={!editing}
                             />
                             {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
@@ -318,8 +341,12 @@ function Registration_page_body(props) {
                                 onChange={
                                     (e) => {
                                         setPersonPhone(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Telephone !== e.target.value) {
+                                            setActivation(false)
+                                        }
                                     }
                                 }
+                                disabled={!editing}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -333,27 +360,68 @@ function Registration_page_body(props) {
                                 variant='standard'
                                 margin='none'
                                 value={geoLocation}
-                                onChange={(e)=>setGeoLocation(e.target.value)}
+                                onChange={
+                                    (e) => {
+                                        setGeoLocation(e.target.value)
+                                        if (props?.default_editing_option === "read_only" && props?.initial_record?.Location !== e.target.value) {
+                                            console.log(e.target.value)
+                                            setActivation(false)
+                                        }
+                                    }
+                                }
+                                disabled={!editing}
                             />
                         </Grid>
                         <Grid item xs={12} style={{ textAlign: "center" }}>
                             <Fab color="primary" aria-label="Submit" size="small" sx={{ mt: 3, mb: 2 }}
-                                margin='none' onClick={() => fill_with_current_location()} >
+                                margin='none' onClick={() => fill_with_current_location()} disabled={!editing}>
                                 <MyLocationIcon />
                             </Fab>
                             <span>  </span>
                             <Fab color="primary" aria-label="CheckLocationGoogleMap" size="small" sx={{ mt: 3, mb: 2 }}
-                                margin='none' onClick={() => check_direction_on_map()} >
+                                margin='none' onClick={() => check_direction_on_map()} disabled={!editing} >
                                 <MapIcon />
                             </Fab>
                         </Grid>
                     </Grid>
-                    <Grid item xs={12} style={{ textAlign: "center" }}>
-                    <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={() => submit_registration()}>
-
-                        <CheckIcon />
-                        Submit
-                    </Fab>
+                    <Grid item xs={12} style={{ textAlign: "center" }} hidden={(props.default_editing_option === "read_only")}>
+                        <Fab color="primary" variant="extended" aria-label="Submit" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={() => submit_registration()}>
+                            <CheckIcon />
+                            Submit
+                        </Fab>
+                    </Grid>
+                    <Grid container item xs={12}>
+                        <Grid item xs={2} style={{ textAlign: "center" }} hidden={(props.default_editing_option !== "read_only")}>
+                            <Fab color="error" /* variant="extended" */ aria-label="Update" size="small" disabled={false} sx={{ mt: 3, mb: 2 }} onClick={async () => { delete_record(props.initial_record.Name) }}>
+                                <DeleteOutlineIcon />
+                                {/* Update */}
+                            </Fab>
+                        </Grid>
+                        <Grid item xs={8} style={{ textAlign: "center" }} hidden={(props.default_editing_option !== "read_only")}>
+                            <span>  </span>
+                        </Grid>
+                        <Grid item xs={2} style={{ textAlign: "center" }} hidden={(props.default_editing_option !== "read_only")}>
+                            <Fab color="primary" /* variant="extended" */ aria-label="Update" size="small" disabled={activation} sx={{ mt: 3, mb: 2 }} onClick={async () => {
+                                update_record(
+                                    personName,
+                                    {
+                                        Name: personName,
+                                        Address: personAddress,
+                                        Location: geoLocation,
+                                        Class: personClass,
+                                        Discriptor: props.initial_record.Discriptor,
+                                        Telephone: personPhone,
+                                        Birthdate: personBirthdate
+                                    }
+                                )
+                                if (props?.default_editing_option === "read_only" && props?.initial_record?.Name !== personName) {
+                                    delete_record(props.initial_record.Name)
+                                }
+                            }}>
+                                <SaveIcon />
+                                {/* Update */}
+                            </Fab>
+                        </Grid>
                     </Grid>
                 </Box>
             </Box>
