@@ -218,35 +218,45 @@ def regist_session(
 	
 	return LACK_OF_VOLANTIERS
 
-@app.route("/volantiers/join/",methods=['POST'])
+@app.route("/volantiers/join/",methods=['GET'])
 def regist_volantier()->Any:
 	#TODO document this
 	try:
-		result=request.get_json()
-		if result==POST_NOK_BAD_FORMATE :
-			raise ValueError( "POST_NOK_BAD_FORMATE")
+		# result=request.get_json()
+		# if result==POST_NOK_BAD_FORMATE :
+		# 	raise ValueError( "POST_NOK_BAD_FORMATE")
 
 		aVolantierId:VolantierId=str(time())
 		volantiers_dict[aVolantierId]=Volantier(aVolantierId,1,list())
-		return aVolantierId,POST_OK
+		return aVolantierId
 	except ValueError:
 		return POST_NOK_BAD_FORMATE
 
 @app.route("/volantier/<string:volantier_id>/task",methods=['GET'])
-def get_task(volantier_id:VolantierId):#TODO document this
-	try:
-		if len(volantiers_dict[volantier_id].emergency_q) :
-			volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].emergency_q.pop(0))
-			VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"]="Progress"
-			return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]],GET_OK
-		elif len(volantiers_dict[volantier_id].normal_q ):
-			volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].normal_q.pop(0))
-			VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"]="Progress"
-			return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]],GET_OK
-		else:#TODO : steal task from others
-			return None,GET_OK
-	except:
-		return None,GET_OK_NO_CONTENT
+def get_task(volantier_id:VolantierId):
+    #TODO document this
+    try:
+        print("Executing branch with try")
+        if len(volantiers_dict[volantier_id].emergency_q):
+            print("Executing branch with emergency_q")
+            volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].emergency_q.pop(0))
+            VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"] = "Progress"
+            print(VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK)
+            return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK
+        elif len(volantiers_dict[volantier_id].normal_q):
+            print("Executing branch with normal_q")
+            volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].normal_q.pop(0))
+            VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"] = "Progress"
+            print(VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK)
+            return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK
+        else:  # TODO : steal task from others
+            print("Executing branch with no tasks")
+            print(GET_OK)
+            return "no task",GET_OK
+    except:
+        print("Executing exception branch")
+        print(None,GET_OK_NO_CONTENT)
+        return None,GET_OK_NO_CONTENT
 
 @app.route("/Volantier/Task/result?Id=<string:id>&Task_Id=<string:task_id>&Result=<result>&Quit=<int:quit>")
 def volantier_post_task_result(

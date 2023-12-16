@@ -19,7 +19,7 @@ POST_NOK_BAD_FORMATE:Final[int]=1400
 GET_OK:Final[int]=200
 """refer that get requist completed from server side successfully"""
 
-GET_OK_NO_CONTENT:Final[int]=1200
+GET_OK_NO_CONTENT:Final[int]=404
 """refer that get requist completed from server side successfully but no content"""
 
 VOLANTIER_TIMEOUT:Final[float]=120.0

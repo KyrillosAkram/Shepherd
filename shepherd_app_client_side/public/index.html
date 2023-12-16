@@ -14,6 +14,15 @@
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
+    <!-- <script src="//code.jquery.com/jquery-2.1.0.min.js"></script> -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+      <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+    <!-- <script src="%PUBLIC_URL%/leaflet-locationpicker.js"></script> -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -27,7 +36,8 @@
     <!-- <script  src="face-api.min.js"></script> -->
     <style type="text/css">
       .hidden { display:none; }
-  </style>
+      #map { height: 180px; }
+    </style>
     <title>Shepherd-React</title>
     <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
   </head>

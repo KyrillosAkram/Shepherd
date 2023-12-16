@@ -1,3 +1,6 @@
 {
-    "recommendations": []
+    "recommendations": [
+        "codeium.codeium",
+        "postman.postman-for-vscode"
+    ]
 }
