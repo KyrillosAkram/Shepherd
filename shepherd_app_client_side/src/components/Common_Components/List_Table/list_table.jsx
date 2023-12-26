@@ -7,12 +7,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import theme from '../../../theme'
-import { Checkbox, Typography } from '@mui/material';
+// import theme from '../../../theme'
+import { Checkbox/* , Typography */ } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import {useSignle} from '@preact/signals'
+// import Button from '@mui/material/Button';
+// import {useSignle} from '@preact/signals'
 import {get_record} from '../../../db'
 import Registration_page_body from '../../Body/Registration/pageBody'
 
@@ -42,7 +42,7 @@ export function createData(...cells) {
 }
 
 
-function descendingComparator(a, b, orderBy) {
+/* function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
     }
@@ -50,13 +50,13 @@ function descendingComparator(a, b, orderBy) {
         return 1;
     }
     return 0;
-}
+} */
 
-function getComparator(order, orderBy) {
+/* function getComparator(order, orderBy) {
     return order === 'desc'
         ? (a, b) =>  descendingComparator(a, b, orderBy)
         : (a, b) => -descendingComparator(a, b, orderBy);
-}
+} */
 
 // Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
 // stableSort() brings sort stability to non-modern browsers (notably IE11). If you
@@ -77,23 +77,23 @@ function stableSort(array, comparator) {
 
 export default function CustomizedTable(props)
 {
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const { onSelectAllClick, numSelected, rowCount, onRequestSort,rows,setRows } = props;
+    // const [order, setOrder] = React.useState('asc');
+    // const [orderBy, setOrderBy] = React.useState('calories');
+    // const [selected, setSelected] = React.useState([]);
+    // const [page, setPage] = React.useState(0);
+    // const [dense, setDense] = React.useState(false);
+    // const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const { /* onSelectAllClick, */ numSelected, rowCount, /* onRequestSort, */rows,setRows } = props;
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     
 
-    const handleRequestSort = (event, property) => {
+/*     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
-    };
+    }; */
     const table_ref=React.useRef(null)
 
     const handleSelectAllClick = () => {
@@ -114,7 +114,7 @@ export default function CustomizedTable(props)
     
     
 
-    const handleChangePage = (event, newPage) => {
+/*     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
 
@@ -122,12 +122,12 @@ export default function CustomizedTable(props)
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-
-    const handleChangeDense = (event) => {
+ */
+    /* const handleChangeDense = (event) => {
         setDense(event.target.checked);
-    };
+    }; */
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    // const isSelected = (name) => selected.indexOf(name) !== -1;
 
     return (
         <TableContainer origin={"indexedDB.sefain_brain.children"} ref={table_ref} component={Paper} style={{ width: 'auto', margin: '10px', alignContent: 'center' }}>
