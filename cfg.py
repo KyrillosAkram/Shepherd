@@ -6,7 +6,7 @@ USED_FORNTEND:Literal["Vanila","React"]="React"
 React_Index_path:str=r"""shepherd_app_client_side"""+sep+"""build"""+sep+"""index.html"""
 React_Build_path:str=r"""shepherd_app_client_side"""+sep+"""build"""
 Vanila_Index_path:str="""Session.html"""
-
+DEBUG:bool=True
 POST_OK:Final[int]=201
 """refer that post requist completed from server side successfully"""
 

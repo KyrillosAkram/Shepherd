@@ -61,6 +61,14 @@ export default function SwipeableTemporaryDrawer(props) {
               <ListItemText primary={'Session'} />
             </ListItemButton>
         </ListItem>
+        <ListItem key={'Task'} disablePadding>
+            <ListItemButton onClick={()=>{props.setPageName("Task")}}>
+              <ListItemIcon>
+                <FamilyRestroomIcon />
+              </ListItemIcon>
+              <ListItemText primary={'Task'} />
+            </ListItemButton>
+        </ListItem>
       </List>
       <Divider />
       <List>

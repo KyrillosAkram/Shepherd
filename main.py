@@ -1,3 +1,4 @@
+#!C:\Program Files\Python311\python.exe
 #!/usr/bin/env python
 """@file main.py {flaskServer} 
 @brief the entry point to the server which send assets file, manage sessions and volantiers
@@ -19,10 +20,12 @@ from typing import Literal,Union,List,Dict,TypedDict,Any,Tuple
 # pylint: enable=W0611:unused-import
 
 from dataclasses import dataclass ,field
-from flask import Flask,request,Response
+from flask import Flask,request,Response,jsonify
 from flask.helpers import send_file#, send_from_directory
 from cfg import *
 import re
+import json
+
 VolantierTaskId	=str
 VolantierId		=str
 Taskidtaskid	=str
@@ -33,7 +36,7 @@ VolantierTask=TypedDict(
 		"type":Literal["facial_landmark@128","facial_landmarks@128"],
 		"table":str,
 		"payload":str,
-		"state":Literal["Queue","Progress","Finished"],
+		"state":Literal["Queue","Progress","Finished","Failed"],
 		"volantier":VolantierId,
 		"created":float,
 		"started":float,
@@ -61,7 +64,23 @@ class Volantier():
 		self.quit_request:bool=False
 		self.connectivity_q:List[tuple[float]]=[]#List(maxsize=self.CONNECTIVITY_MAX_SIZE)
 		self.last_connection:float=time()
-
+	def __iter__(self):
+		for key in self.__dict__:
+			yield (key,self.__dict__[key])
+		# return {
+			# "name":self.__name,
+			# "workers":self.__workers,
+			# "tables":self.__tables,
+			# "emergency_q":self.emergency_q,
+			# "normal_q":self.normal_q,
+			# "in_progress_q":self.in_progress_q,
+			# "quit_request":self.quit_request,
+			# "connectivity_q":self.connectivity_q,
+			# "last_connection":self.last_connection
+		# }
+	def to_json(self):
+			return json.dumps(self, default=lambda o: o.__dict__, 
+				sort_keys=True, indent=4)
 	def get_name(self)->str:
 		return self.__name
  
@@ -228,6 +247,7 @@ def regist_volantier()->Any:
 
 		aVolantierId:VolantierId=str(time())
 		volantiers_dict[aVolantierId]=Volantier(aVolantierId,1,list())
+		volantiers_id.append(aVolantierId)
 		return aVolantierId
 	except ValueError:
 		return POST_NOK_BAD_FORMATE
@@ -242,17 +262,17 @@ def get_task(volantier_id:VolantierId):
             volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].emergency_q.pop(0))
             VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"] = "Progress"
             print(VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK)
-            return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK
+            return jsonify( VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]] )
         elif len(volantiers_dict[volantier_id].normal_q):
             print("Executing branch with normal_q")
             volantiers_dict[volantier_id].inPrgressQ.append(volantiers_dict[volantier_id].normal_q.pop(0))
             VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]]["state"] = "Progress"
             print(VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK)
-            return VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]], GET_OK
+            return jsonify( VolantierTasks[volantiers_dict[volantier_id].inPrgressQ[0]] )
         else:  # TODO : steal task from others
             print("Executing branch with no tasks")
             print(GET_OK)
-            return "no task",GET_OK
+            return jsonify({}),GET_OK
     except:
         print("Executing exception branch")
         print(None,GET_OK_NO_CONTENT)
@@ -285,8 +305,10 @@ def task_get_result(id:str)->Tuple[Any,int]:#TODO document this
 		return VolantierTasks[id]["result"],GET_OK
 	return None,GET_OK_NO_CONTENT
 
-@app.route("/Task/submit?type=<string:type>&table=<string:table>&payload=<string:payload>")
-def task_submit(type:str,table:str,payload:str):
+@app.route("/Task/submit"#?type=<string:type>&table=<string:table>&payload=<string:payload>"
+			,methods=["POST"])
+def task_submit(#type:str,table:str,payload:str
+				):
 	"""task submit handler creates task , assigne volantier for it and requeue volatiers
 #TODO document this
 	Args:
@@ -297,7 +319,12 @@ def task_submit(type:str,table:str,payload:str):
 	Returns:
 		_type_: response code of ( POST_OK or SERVICE_NOT_AVAILABLE )
 	"""
+	print("task submit")
+	type:str=request.args.get("type")
+	payload=""
+	table=""
 	size_of_volantier:int=len(volantiers_id)
+	print(size_of_volantier)
 	if size_of_volantier:
 		taskid:str=str(time())
 		VolantierTasks[taskid]=VolantierTask({
@@ -311,12 +338,40 @@ def task_submit(type:str,table:str,payload:str):
 			"result":None
 		})
 		volantiers_dict[volantiers_id[0]].put_task(taskid)
+		print(f"{taskid} assigned to {volantiers_id[0]}")
 		if size_of_volantier>1:
 			volantiers_id_rotate()
-		return POST_OK
-	return SERVICE_NOT_AVAILABLE
+		return f"{taskid}"
+	return "SERVICE_NOT_AVAILABLE"
 
 
+if DEBUG:
+	
+	@app.route("/watch")
+	def watch():
+		"""return json of all global variables work only if DEBUG is True
+		@depricated since v0.2.0
+		@return json
+		"""
+		from pprint import pprint
+		pprint({
+			"VolantierTasks":VolantierTasks,
+			"volantiers_dict":{key:dict(value) for key,value in volantiers_dict.items()}
+		})
+		data=jsonify({
+			"VolantierTasks":VolantierTasks,
+			"volantiers_dict":{key:dict(value) for key,value in volantiers_dict.items()}
+		})
+		print(data)
+		pprint(request.__dict__)
+	# 	response = app.response_class(
+    #     response=json.dumps(data),
+    #     status=200,
+    #     mimetype='application/json'
+    # )
+	# 	print(response)
+		return data
+	
 # from os import chdir,getcwd
 if USED_FORNTEND == "Vanila":
 	# print(f"USED FORNTEND == Vanila opertate from {getcwd()}")

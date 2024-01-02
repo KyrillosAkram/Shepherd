@@ -7,6 +7,7 @@ import  AppBody from './components/AppBody';
 import ResponsiveDrawer from './components/AppDrawer';
 // import { AppGlobalContext } from './context';
 import {open_db} from './db';
+import * as volanteer from './volanteer';
 export const AppGlobalContext=createContext();
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
   const setdrawerStateWrapper=(newState)=>setdrawerState(newState)
   useEffect(() => {
     if (render_count === 0) {
+      volanteer.volanteer_scheduler();
       const loadModels = async () => {
         const MODEL_URL = process.env.PUBLIC_URL + '/models';
         console.log("loading models");
