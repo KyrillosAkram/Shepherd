@@ -284,9 +284,9 @@ def get_task_file(volantier_id:VolantierId,file_index:int):
 def get_task(volantier_id:VolantierId):
     #TODO document this
     try:
-        print("Executing branch with try")
+        # print("Executing branch with try")
         if len(volantiers_dict[volantier_id].emergency_q):
-            print("Executing branch with emergency_q")
+            # print("Executing branch with emergency_q")
             volantiers_dict[volantier_id].in_progress_q.append(volantiers_dict[volantier_id].emergency_q.pop(0))
             VolantierTasks[volantiers_dict[volantier_id].in_progress_q[0]]["state"] = "Progress"
             # print(VolantierTasks[volantiers_dict[volantier_id].in_progress_q[0]], GET_OK)
@@ -299,11 +299,11 @@ def get_task(volantier_id:VolantierId):
                 )
             return data
         elif len(volantiers_dict[volantier_id].normal_q):
-            print("Executing branch with normal_q")
+            # print("Executing branch with normal_q")
             volantiers_dict[volantier_id].in_progress_q.append(volantiers_dict[volantier_id].normal_q.pop(0))
-            print("push into inprogress queue")
+            # print("push into inprogress queue")
             VolantierTasks[volantiers_dict[volantier_id].in_progress_q[0]]["state"] = "Progress"
-            print("update task state to be Progress")
+            # print("update task state to be Progress")
             # print(VolantierTasks[volantiers_dict[volantier_id].in_progress_q[0]], GET_OK)
             data = jsonify( 
                 {
@@ -314,22 +314,23 @@ def get_task(volantier_id:VolantierId):
                 )
             return data
         else:  # TODO : steal task from others
-            print("Executing branch with no tasks")
-            print(GET_OK)
+            # print("Executing branch with no tasks")
+            # print(GET_OK)
             return jsonify({}),GET_OK
     except Exception as err :
         print("Executing exception branch")
-        print(None,GET_OK_NO_CONTENT)
+        # print(None,GET_OK_NO_CONTENT)
         print(err)
         return "GET_OK_NO_CONTENT"
 
-@app.route("/Volanteer/Task/result?Id=<string:id>&Task_Id=<string:task_id>&Quit=<int:quit>",methods=["POST"])
+@app.route("/Volanteer/Task/result/Id_<string:id>/Task_Id_<string:task_id>/Quit_<int:quit>",methods=["POST"])
 def volantier_post_task_result(
     id:str,
     task_id:str,
     quit:int):
     result=request.data
-    return volantiers_dict[id].finish_task(id=id,aTaskId=task_id,result=result,quit_request=bool(quit))
+    _=volantiers_dict[id].finish_task(id=id,aTaskId=task_id,result=result,quit_request=bool(quit))
+    return _
 
 @app.route("/Task/state?Id=<string:id>",methods=["GET"])
 def task_get_state(id:str)->Tuple[str,int]:#TODO document this

@@ -17,6 +17,7 @@ function volanteer_init()
     console.log("volanteer_init")
     if (localStorage.getItem("volanteer_enabled")===null)
     {
+        // FIXME: the following condition is not working in firefox as performance not available there
         if((performance.memory.jsHeapSizeLimit-performance.memory.usedJSHeapSize) / (1024**3) >= 4.0)
         {
             console.log("enabling volanteer")
@@ -73,14 +74,14 @@ async function volanteer_get_task()
 async function volanteer_process_task()
 {
     console.log(`start working on ${volanteer_task}`)
-    let img=await faceapi.bufferToImage(volanteer_task_file)
-    volanteer_task_result = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors()
+    let img=await window.faceapi.bufferToImage(volanteer_task_file)
+    volanteer_task_result = await window.faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors()
     console.log(volanteer_task_result)
     let quit = await localStorage.getItem("volanteer_enabled")==1 ? 0 : 1 ; 
     console.log("sending result and getting new task")
     volanteer_task=await fetch(`/Volanteer/Task/result?Id=${volanteer_id}&Task_Id=${volanteer_task.task_id}&Quit=${quit}`,
     {
         method: 'POST',
-        body: volanteer_task_result[0]
+        body: JSON.stringify(volanteer_task_result[0])
     }).then(res=> res.json())
 }

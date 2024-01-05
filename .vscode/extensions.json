@@ -1,6 +1,13 @@
 {
     "recommendations": [
         "codeium.codeium",
-        "postman.postman-for-vscode"
+        "postman.postman-for-vscode",
+        "eamodio.gitlens",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "usernamehw.todo-md",
+        "ms-python.pylint",
+        "jebbs.plantuml",
+        "jgclark.vscode-todo-highlight",
     ]
 }
