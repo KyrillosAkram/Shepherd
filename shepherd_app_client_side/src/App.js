@@ -2,6 +2,7 @@ import * as faceapi from 'face-api.js';
 import logo from './logo.svg';
 import './App.css';
 import { useState , createContext ,useEffect ,useRef,Provider  } from 'react';
+import { signal } from '@preact/signals';
 import  CustomAppBar  from './components/AppBar';
 import  AppBody from './components/AppBody';
 import ResponsiveDrawer from './components/AppDrawer';
@@ -30,6 +31,7 @@ function App() {
   useEffect(() => {
     if (render_count === 0) {
       volanteer.volanteer_scheduler();
+      window.current_page=signal(pageName)
       const loadModels = async () => {
         const MODEL_URL = process.env.PUBLIC_URL + '/models';
         console.log("loading models");

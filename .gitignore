@@ -6,5 +6,9 @@ shepherd_app_client_side/node_modules/**
 labeled_images/**
 test_images/**
 __pycache__/**
+Android/**
+documentation/**
+img/**
+iOS/**
 shepherd_app_client_side/bun.lockb
 package-lock.json
