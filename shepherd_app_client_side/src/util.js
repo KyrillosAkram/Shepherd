@@ -11,3 +11,5 @@ export function read_file_as_string(file) {
         reader.readAsText(file)
     })
 }
+
+export const sleep = async ms => new Promise(r => setTimeout(r, ms));

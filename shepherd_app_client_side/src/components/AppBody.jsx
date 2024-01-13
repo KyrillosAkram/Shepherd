@@ -9,6 +9,7 @@ import Registed_page_body from './Body/Registed/pageBody';
 import Registration_page_body from './Body/Registration/pageBody';
 import Task_page_body from './Body/task/pageBody';
 import Volanteering_page_body from './Body/Volanteering/pageBody';
+import { volanteer_switch } from '../volanteer';
 // import { createData } from './Common_Components/List_Table/list_table';
 // import {get_all_recorded_rows} from '../db';
 // import { createData } from './Common_Components/List_Table/list_table';
@@ -43,7 +44,7 @@ export default function AppBody(props) {
           <Task_page_body optional_editing={true} default_editing_option={""} initial_record={undefined}/>
        </TabPanel>
         <TabPanel value="Volanteering">
-          <Volanteering_page_body optional_editing={true} default_editing_option={""} initial_record={undefined}/>
+          <Volanteering_page_body optional_editing={true} default_editing_option={""} initial_record={undefined} volanteer_switch={volanteer_switch}/>
        </TabPanel>
       </TabContext>
       {/* <CustomizedSnackbars/> */}
