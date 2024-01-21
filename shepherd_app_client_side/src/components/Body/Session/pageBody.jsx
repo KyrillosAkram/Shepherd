@@ -187,7 +187,7 @@ export default function Session_page_body() {
     refReturning_list.current=Returning_list
     refOpenGoing.current=openGoing
     refOpenReturning.current=openReturning
-    console.log("session page body rendered")
+    window.devMode && console.log("session page body rendered")
   })
 
   /**
@@ -200,7 +200,7 @@ export default function Session_page_body() {
    */
   const setGoing_list_wrapper= async (newState)=>{
     await setGoing_list(newState)
-    console.log(newState.Length)
+    window.devMode && console.log(newState.Length)
     await setGoing_count(newState.length);
     await Session_update_missing_table(newState.map(recored=>{return recored.cells[0]}),Returning_list.map(recored=>{return recored.cells[0]}));
 }
@@ -290,7 +290,7 @@ function Session_Actions_Load()
 }
 async function Session_check_import_json(event) {
   let input_element =event.target
-  console.log(input_element)
+  window.devMode && console.log(input_element)
   try {
       if (input_element.files.length) {
         let json_content = await read_file_as_string(input_element.files[0])
@@ -311,7 +311,7 @@ async function Session_check_import_json(event) {
   }
 }
 function Session_Actions_Import() {
-  console.log(document.querySelector("input#json_input"))
+  window.devMode && console.log(document.querySelector("input#json_input"))
   let input_element = document.querySelector("input#json_input")
   input_element.addEventListener("change", Session_check_import_json)
     document.querySelector("input#json_input").click()
@@ -361,16 +361,16 @@ function Session_get_missing(big_array, small_array) {
 
 async function Session_update_missing_table(Going_names, Returning_names)
 {
-  console.log(Going_names.length, Returning_names.length)
+  window.devMode && console.log(Going_names.length, Returning_names.length)
   if (Going_names.length === 0 && Returning_names.length === 0)
   {
-    console.log("no missing")
+    window.devMode && console.log("no missing")
     setMissing_list_wrapper([])
   }
   else
   {
     let missing_names = await Session_get_missing(Going_names, Returning_names)
-    console.log(missing_names)
+    window.devMode && console.log(missing_names)
     let missing_recoreds = await Session_get_children(missing_names)
     let missing_data = missing_recoreds.map(record => { return createData(...[record.Name, record.Class, record.Address]) })
     setMissing_list_wrapper(missing_data)
@@ -378,7 +378,7 @@ async function Session_update_missing_table(Going_names, Returning_names)
 }
 
 function Session_check_input_add(input) {
-  console.log(input)
+  window.devMode && console.log(input)
   if (input?.files?.length) {
       Session_detect_descriptors(input.files)
       input.value='' //[kakram] to reset the input file to prevent redetection on same image
@@ -460,7 +460,7 @@ async function Session_active_table_add_children(children_name) {
             if (!active_table_existed_children.includes(child)) {
                 let child_data = await obj.get(child)
                 let child_raw = [child_data.Name, child_data.Class, child_data.Address]
-                console.log(child_data)
+                window.devMode && console.log(child_data)
                 new_detected_children.push(createData(...child_raw))
             }
         }
@@ -470,13 +470,13 @@ async function Session_active_table_add_children(children_name) {
             if (!active_table_existed_children.includes(child)) {
               let child_data = await obj.get(child)
               let child_raw = [child_data.Name, child_data.Class, child_data.Address]
-              console.log(child_data)
+              window.devMode && console.log(child_data)
               new_detected_children.push(createData(...child_raw))
             }
         }
     }
 
-    console.log(new_detected_children)
+    window.devMode && console.log(new_detected_children)
     if(openGoing)
     {
       setGoing_list_wrapper([...Going_list, ...new_detected_children])
@@ -640,7 +640,7 @@ function Session_from_active_table_get_listed_children_name() {
       </Stack>
           <a id={"downloadAnchorElem"} class={"hidden"}  ></a>
           <input type={"file"} id={"json_input"} class={ "hidden" } accept={ ".json,application/json" }
-                onchange={ (e)=>{console.log(e);Session_check_import_json(this)}}/>
+                onchange={ (e)=>{window.devMode && console.log(e);Session_check_import_json(this)}}/>
         <ManualAddModal open={manualAdd} setOpen={setManualAdd} setGoing_list={setGoing_list_wrapper} setReturning_list={setReturning_list_wrapper} refGoing_list={refGoing_list} refReturning_list={refReturning_list} refOpenGoing={refOpenGoing} refOpenReturning={refOpenReturning}/>
         <div id="fake_div"></div>
     </div>

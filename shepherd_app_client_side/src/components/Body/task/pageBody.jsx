@@ -17,7 +17,7 @@ import Switch from '@mui/material/Switch';
 import {delete_record,update_record} from '../../../db';
 
 function Task_page_body(props) {
-    console.log(props.initial_record)
+    window.devMode && console.log(props.initial_record)
     const [geoLocation, setGeoLocation] = React.useState(props?.initial_record?.Location);
     const [personName, setPersonName] = React.useState(props?.initial_record?.Name);
     const [personAddress, setPersonAddress] = React.useState(props?.initial_record?.Address);

@@ -2,13 +2,15 @@ import * as faceapi from 'face-api.js';
 import logo from './logo.svg';
 import './App.css';
 import { useState , createContext ,useEffect ,useRef,Provider  } from 'react';
-import { signal } from '@preact/signals';
 import  CustomAppBar  from './components/AppBar';
 import  AppBody from './components/AppBody';
 import ResponsiveDrawer from './components/AppDrawer';
 // import { AppGlobalContext } from './context';
 import {open_db} from './db';
 import * as volanteer from './volanteer';
+import {Provider as ReduxProvider} from 'react-redux'
+import {createStore} from 'redux'
+import store from './store';
 export const AppGlobalContext=createContext();
 
 function App() {
@@ -30,11 +32,21 @@ function App() {
   const setdrawerStateWrapper=(newState)=>setdrawerState(newState)
   useEffect(() => {
     if (render_count === 0) {
-      volanteer.volanteer_scheduler();
-      window.current_page=signal(pageName)
+      if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
+      {
+        window.devMode && console.log("this development Mode")
+        window.devMode=true
+      }
+      else
+      {
+        window.devMode && console.log("this production Mode")
+        window.devMode=false
+      }
+      // volanteer.volanteer_scheduler();
+      window.current_page=pageName
       const loadModels = async () => {
         const MODEL_URL = process.env.PUBLIC_URL + '/models';
-        console.log("loading models");
+        window.devMode && console.log("loading models");
         setProgressCircleState('progress')
         Promise.all([
           window.faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
@@ -43,14 +55,14 @@ function App() {
           window.faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
         ]).then(
           setModelsLoaded(true),
-          console.log("models loaded"),
+          window.devMode && console.log("models loaded"),
           setProgressCircleState('done')
-        ).catch(err => console.log(err));
+        ).catch(err => window.devMode && console.log(err));
       }
       loadModels();
     }
     render_count++;
-    console.log(`render_count ${render_count}`)
+    window.devMode && console.log(`render_count ${render_count}`)
 }, []);
   const AppCTRL=
   {
@@ -65,14 +77,16 @@ function App() {
   const drawerOpenerCallback=(e)=>setdrawerState({...drawerState,left:true})
   return ( //TODO: consider login view
     <div className="App">
-      <AppGlobalContext.Provider value={AppCTRL}>
-        <CustomAppBar
-          title={pageName}
-          drawerOpener={drawerOpenerCallback}
-          progressCircleState={progressCircleState} />
-        <AppBody page={pageName} />
-        <ResponsiveDrawer drawerState={drawerState} setDrawerState={setdrawerState} setPageName={setPageName} />
-      </AppGlobalContext.Provider>
+      <ReduxProvider store={store}>
+        <AppGlobalContext.Provider value={AppCTRL}>
+          <CustomAppBar
+            title={pageName}
+            drawerOpener={drawerOpenerCallback}
+            progressCircleState={progressCircleState} />
+          <AppBody page={pageName} />
+          <ResponsiveDrawer drawerState={drawerState} setDrawerState={setdrawerState} setPageName={setPageName} />
+        </AppGlobalContext.Provider>
+      </ReduxProvider>
     </div>
 
   );

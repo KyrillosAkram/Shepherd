@@ -30,7 +30,7 @@ function LocationMarker(props) {
     const map = useMapEvents({
         click(e) {
             props.setMapPosition(e.latlng)
-            console.log(e.latlng)
+            window.devMode && console.log(e.latlng)
             props.setGeoLocation(`${e.latlng.lat},${e.latlng.lng}`)
             
         },
@@ -54,7 +54,7 @@ function LocationMarker(props) {
 
 
 function Registration_page_body(props) {
-    console.log(props.initial_record)
+    window.devMode && console.log(props.initial_record)
     const [geoLocation, setGeoLocation] = React.useState(props?.initial_record?.Location);
     const [personName, setPersonName] = React.useState(props?.initial_record?.Name);
     const [personAddress, setPersonAddress] = React.useState(props?.initial_record?.Address);
@@ -68,7 +68,7 @@ function Registration_page_body(props) {
     const [mapPosition, setMapPosition] = React.useState(null)
     
     const switch_render = (state) => {
-        console.log(state)
+        window.devMode && console.log(state)
         if (state === "read_only") {
             return <Grid item container >
                 <Grid item xs={12} style={{ textAlign: "center" }}>
@@ -101,11 +101,11 @@ function Registration_page_body(props) {
     }
     async function fill_with_current_location() {
         if (navigator.geolocation) {
-            console.log(navigator.geolocation.getCurrentPosition)
+            window.devMode && console.log(navigator.geolocation.getCurrentPosition)
             navigator.geolocation.getCurrentPosition(set_location);
-            console.log("Geolocation is detected")
+            window.devMode && console.log("Geolocation is detected")
         } else {
-            console.log("Geolocation is not supported by this browser.")
+            window.devMode && console.log("Geolocation is not supported by this browser.")
         }
     }
     function check_direction_on_map() {
@@ -122,13 +122,13 @@ function Registration_page_body(props) {
     function submit_registration() {
         let check_counter = 7
         //TODO: implement warning on snak bar
-        !Boolean(document.getElementById("registration_cam").value == '') ? check_counter-- : console.log("please select/take image");
-        (Boolean(personName)) ? check_counter-- : console.log("please enter the name");
-        (Boolean(personAddress)) ? check_counter-- : console.log("please enter the address");
-        (Boolean(geoLocation)) ? check_counter-- : console.log("please enter the location");
-        (Boolean(personClass)) ? check_counter-- : console.log("please choose class");
-        (Boolean(personPhone)) ? check_counter-- : console.log("please enter the telephone");
-        (Boolean(personBirthdate)) ? check_counter-- : console.log("please enter the birthdate");
+        !Boolean(document.getElementById("registration_cam").value == '') ? check_counter-- : window.devMode && console.log("please select/take image");
+        (Boolean(personName)) ? check_counter-- : window.devMode && console.log("please enter the name");
+        (Boolean(personAddress)) ? check_counter-- : window.devMode && console.log("please enter the address");
+        (Boolean(geoLocation)) ? check_counter-- : window.devMode && console.log("please enter the location");
+        (Boolean(personClass)) ? check_counter-- : window.devMode && console.log("please choose class");
+        (Boolean(personPhone)) ? check_counter-- : window.devMode && console.log("please enter the telephone");
+        (Boolean(personBirthdate)) ? check_counter-- : window.devMode && console.log("please enter the birthdate");
         if (!check_counter) {// if all checks are ok
             if (Boolean(window.db)) {
                 try {
@@ -146,8 +146,8 @@ function Registration_page_body(props) {
                                 Birthdate: personBirthdate
                             }
                         )
-                        /*debugging &*/ console.log("children.add");
-                        /*debugging &*/ console.log(values)
+                         window.devMode && console.log("children.add");
+                         window.devMode && console.log(values)
                     }).finally(() => {
                         window.registration_discriptor = null
                         setPersonName('')
@@ -162,12 +162,12 @@ function Registration_page_body(props) {
                     })
                     window.registration_discriptor = null;
                 } catch (error) {
-                /*debugging &*/ console.log(error);
-                    console.log(error)
+                 window.devMode && console.log(error);
+                    window.devMode && console.log(error)
                 }
             }
         } else {
-            console.log("Please fill all filds !!!")
+            window.devMode && console.log("Please fill all filds !!!")
         }
 
     }
@@ -191,7 +191,7 @@ function Registration_page_body(props) {
                                 async () => {
                                     //FIXME:[kakram][severity:critical] if cam button is clicked in the second time, the pervious image not deleted before loading another 
                                     AppGlobalContxt.Bar.setProgressCircleStateWrapper('progress')
-                                /*debugging &*/ console.log("cam change called")
+                                 window.devMode && console.log("cam change called")
                                     let image;//, canvas;
                                     const container = document.getElementById("image_section")
                                     if (image) image.remove()
@@ -204,22 +204,22 @@ function Registration_page_body(props) {
                                     //kakram:the following line needed to make the start of the allocated memory for this operation to be freed after finishing
                                     //please check the following issue for more details https://github.com/vladmandic/face-api/issues/25
                                     window.faceapi.tf.engine().startScope();
-                                    console.log(AppGlobalContxt)
-                                    console.log("start scope");
+                                    window.devMode && console.log(AppGlobalContxt)
+                                    window.devMode && console.log("start scope");
                                     await window.faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor().then(
                                         (event) => {
-                                            console.log(event)
+                                            window.devMode && console.log(event)
                                             window.registration_discriptor = { ...event }
-                                        /*debugging &*/ console.log("remove disable");
+                                         window.devMode && console.log("remove disable");
                                             setActivation(false)
                                         }
                                     ).catch(
-                                        (e) => console.log(e)
+                                        (e) => window.devMode && console.log(e)
                                     ).finally(
                                         () => {
                                             window.faceapi.tf.engine().endScope();//kakram: to deallocate the memory selected in last scope
                                             AppGlobalContxt.Bar.setProgressCircleStateWrapper('done')
-                                            console.log('Experiment completed');
+                                            window.devMode && console.log('Experiment completed');
                                         }
                                     );
                                 }
@@ -395,7 +395,7 @@ function Registration_page_body(props) {
                                     (e) => {
                                         setGeoLocation(e.target.value)
                                         if (props?.default_editing_option === "read_only" && props?.initial_record?.Location !== e.target.value) {
-                                            console.log(e.target.value)
+                                            window.devMode && console.log(e.target.value)
                                             setActivation(false)
                                         }
                                     }

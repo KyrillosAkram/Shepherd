@@ -12,3 +12,6 @@ img/**
 iOS/**
 shepherd_app_client_side/bun.lockb
 package-lock.json
+shepherd_app_client_side/__node_modules/**
+shepherd_app_client_side/yarn.lock
+shepherd_app_client_side/__package-lock.json

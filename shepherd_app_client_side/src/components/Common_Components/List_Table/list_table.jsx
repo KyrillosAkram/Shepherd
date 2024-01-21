@@ -12,7 +12,6 @@ import { Checkbox/* , Typography */ } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 // import Button from '@mui/material/Button';
-// import {useSignle} from '@preact/signals'
 import {get_record} from '../../../db'
 import Registration_page_body from '../../Body/Registration/pageBody'
 
@@ -98,7 +97,7 @@ export default function CustomizedTable(props)
 
     const handleSelectAllClick = () => {
         let newSelected
-        console.log(rows[0].selected)
+        window.devMode && console.log(rows[0].selected)
         if (rows[0].selected) {
             newSelected = rows.map((n) =>{return {...n,selected:false}} );
             props.setSelected_count(0)
@@ -108,7 +107,7 @@ export default function CustomizedTable(props)
             newSelected = rows.map((n) =>{return {...n,selected:true}} );
             props.setSelected_count(rows.length)
         }
-        // console.log(newSelected);
+        // window.devMode && console.log(newSelected);
         setRows(newSelected);
     };
     
@@ -181,14 +180,14 @@ export function TableRecord(props) {
     const row_click_handler = async (event) =>{
         if (touchtime === 0) {
             // set first click
-            console.log("first click")
-            console.log(props.data)
+            window.devMode && console.log("first click")
+            window.devMode && console.log(props.data)
             touchtime = new Date().getTime();
         } else {
             // compare first click to this click and see if they occurred within double click threshold
             if (((new Date().getTime()) - touchtime) < 800) {
                 // double click occurred
-                console.log("double clicked");
+                window.devMode && console.log("double clicked");
                 // window.recordname=props.data.cells[0]
                 window.record=await get_record(props.data.cells[0])
                 props.handleOpen()
@@ -203,7 +202,7 @@ export function TableRecord(props) {
 
     const handleClick = React.useCallback((event) =>{
         let toggled ={}
-        // console.log(event.target.checked)
+        // window.devMode && console.log(event.target.checked)
         if (props.data.selected)
         {
             toggled = {...props.data,selected:false}
@@ -220,10 +219,10 @@ export function TableRecord(props) {
         let new_rows=props.rows
         new_rows[props.rows.indexOf(props.data)]=toggled
         props.setRows(new_rows.map((e)=>{return e}))
-        // console.log(props.data)
+        // window.devMode && console.log(props.data)
         // setSelected(newSelected);
     },[props.data,props.selected_count,props.rows,props.selected]);
-    // console.log(props.data )
+    // window.devMode && console.log(props.data )
     return (
         <StyledTableRow key={props.data.cells[0]} onClick={row_click_handler}>{
             //.cells[0]

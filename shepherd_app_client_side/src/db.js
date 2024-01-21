@@ -12,7 +12,7 @@ function refresh_all_registed_childrens()
         // }
         // for (o of document.querySelectorAll('.autocomplete')) { M.Autocomplete.getInstance(o).updateData(obj) }
     }
-    /*debugging &*/ console.log("refresh_all_registed_childrens");
+    window.devMood && console.log("refresh_all_registed_childrens");
 }
 
 
@@ -26,14 +26,14 @@ async function open_db(db_name)
             // const tx=db.transaction("notes","write");
             let children = db.createObjectStore("children", { keyPath: "Name" });
 
-            /*debugging &*/ console.log("upgrade called")
+            window.devMood && console.log("upgrade called")
         };
         request.onsuccess = (event) => {
             var db = event.target.result;
             window.db = db;// backward compatiblity
             window.idb = wrap(window.db);
             refresh_all_registed_childrens()
-            /*debugging &*/ console.log("successful");
+            window.devMood && console.log("successful");
             resolve(db)
         };
         request.onerror = (event) => {
@@ -107,7 +107,7 @@ async function get_record(key,origin="indexedDB.sefain_brain.children"/*, callba
 
 async function delete_record(key,origin="indexedDB.sefain_brain.children")
 {
-    console.log(key)    
+    window.devMood && console.log(key)    
     origin=origin.split(".");
     if (origin[0] === "indexedDB")
     {
@@ -125,7 +125,7 @@ async function delete_record(key,origin="indexedDB.sefain_brain.children")
 
 async function update_record(key, record,origin="indexedDB.sefain_brain.children")
 {
-    console.log(key)
+    window.devMood && console.log(key)
     origin=origin.split(".");
     if (origin[0] === "indexedDB")
     {
