@@ -50,8 +50,33 @@ function Task_page_body(props) {
                                 }
                             } />
                             <Fab color="primary" aria-label="add" size="medium"
-                                onClick={async() => window.submit_task_response=await fetch("/Task/submit",
-                                { method: "POST",body:document.getElementById("demo").files[0]}) }
+                                onClick={async() => {
+
+                                    if(window.devMode)
+                                    {
+                                        window.submit_task_response=fetch("http://localhost:80/Task/submit",
+                                        {
+                                            mode    : 'no-cors',
+                                            url     : `http://localhost:80`,
+                                            method  : "POST",
+                                            body    : document.getElementById("demo").files[0]
+                                        },
+                                        {
+                                            username: "asd",
+                                            password: "1234"
+                                        },
+                                    )
+                                    }else{
+                                        window.submit_task_response=fetch("/Task/submit",
+                                    {
+                                        method  : "POST",
+                                        body    : document.getElementById("demo").files[0]
+                                    }) 
+                                }
+                                window.submit_task_response=await window.submit_task_response
+                                console.log(window.submit_task_response)
+                                }
+                            }
                                 
                             >
                                 S

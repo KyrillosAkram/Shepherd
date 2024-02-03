@@ -103,6 +103,7 @@ export async function volanteer_join()
         ) : fetch('volantiers/join/')
 
         volanteer_id = await response.then((res) => res.json())
+        window.store.dispatch({type:"volanteer_join",id:volanteer_id})
     }
     if(window?.store.getState().volanteer?.enabled)
     {window.volanteer_timer_id=setTimeout(volanteer_get_task,VOLANTEER_INTERSPACE_DELAY);}
@@ -112,8 +113,8 @@ export async function volanteer_join()
 
 export async function volanteer_get_task()
 {
-    window.devMode && console.log("volanteer_get_task")    
-    let response=window.devMode? fetch(`http://localhost:80/volantier/${volanteer_id}/task`,
+    window.devMode && console.log("volanteer_get_task")
+    let response=window.devMode? fetch(`http://localhost:80/volantier/${window.store.getState().volanteer.id}/task`,
     {
         username: "asd",
         password: "1234"
@@ -123,13 +124,27 @@ export async function volanteer_get_task()
         url:`http://localhost:80`,
         method:"get"
     }
-    ):fetch(`volantier/${volanteer_id}/task`)
+    ):fetch(`volantier/${window.store.getState().volanteer.id}/task`)
     
-    volanteer_task= await response.then((res)=> res.json())
-    if(Object.keys(volanteer_task).length !==0)
+    let rejoin = false
+    volanteer_task= await response.then(async (res)=>{
+        let data =await res.json()
+        if(data.invalid_volanteer) 
+        {
+            window.devMode && console.log("the volanteer id is not found, rejoin")
+            window.store.dispatch({type:"volanteer deactivation"})
+            window.store.dispatch({type:"volanteer activation"})
+            rejoin = true
+            window.volanteer_timer_id=setTimeout(volanteer_join,VOLANTEER_INTERSPACE_DELAY)
+        }
+        return data
+    });
+    if (rejoin) return;
+    
+    if(Object.keys(volanteer_task).length !==0 && volanteer_task.invalid_volanteer===undefined)
     {
         window.devMode && console.log(volanteer_task)
-        let response=window.devMode?fetch(`http://localhost:80/volantier/${volanteer_id}/task_file/0`,
+        let response=window.devMode?fetch(`http://localhost:80/volantier/${window.store.getState().volanteer.id}/task_file/0`,
                 {
                     username: "asd",
                     password: "1234"
@@ -139,16 +154,16 @@ export async function volanteer_get_task()
                     url:`http://localhost:80`,
                     method:"get"
                 }
-            ):fetch(`volantier/${volanteer_id}/task_file/0`);
+            ):fetch(`volantier/${window.store.getState().volanteer.id}/task_file/0`);
         volanteer_task_file = await response.then((res)=> res.blob());
-        // volanteer_task_file= await fetch(`volantier/${volanteer_id}/task_file/0`).then((res)=> res.blob())
+        // volanteer_task_file= await fetch(`volantier/${window.store.getState().volanteer.id}/task_file/0`).then((res)=> res.blob())
 
-
+        window.store.dispatch({type:"new task",task:{...volanteer_task,file:[volanteer_task_file]}});
         if(window?.store.getState().volanteer?.enabled)
         window.volanteer_timer_id=setTimeout(volanteer_process_task,VOLANTEER_INTERSPACE_DELAY);
         volanteer_no_task_counter=0;
     }
-    else
+    else if (volanteer_task.invalid_volanteer===undefined)
     {
         window.devMode && console.log("no task")
         if(volanteer_no_task_counter < window.volanteer_max_no_task_counter)
@@ -162,6 +177,11 @@ export async function volanteer_get_task()
             if(window?.store.getState().volanteer?.enabled)
             window.volanteer_timer_id=setTimeout(volanteer_get_task,VOLANTEER_INTERSPACE_DELAY+volanteer_no_task_counter*1000);  
         }
+    }
+    else
+    {
+        window.devMode && console.log("invalid volanteer")
+        window.volanteer_timer_id=setTimeout(volanteer_join,VOLANTEER_INTERSPACE_DELAY)
     }
 
 }
@@ -180,31 +200,39 @@ export async function volanteer_process_task()
     }
     window.volanteer_done_global_counter++
     
-    let response=window.devMode?fetch(`http://localhost:80/Volanteer/Task/result/Id_${volanteer_id}/Task_Id_${volanteer_task.task_id}/Quit_${quit}`,
+    let response;
+    if(window.devMode)
     {
-        username: "asd",
-        password: "1234"
-    },
-    {
-        mode: 'no-cors',
-        url:`http://localhost:80`,
-        method:"post",
-        body: JSON.stringify(volanteer_task_result)
+        response=fetch(`http://localhost:80/Volanteer/Task/result/Id_${window.store.getState().volanteer.id}/Task_Id_${window.store.getState().volanteer.task.task_id}/Quit_${quit}`,
+        {
+            mode: 'no-cors',
+            url:`http://localhost:80`,
+            method:"POST",
+            body: JSON.stringify(volanteer_task_result)
+        },
+        {
+            username: "asd",
+            password: "1234"
+        },)
     }
-    ):fetch(`Volanteer/Task/result/Id_${volanteer_id}/Task_Id_${volanteer_task.task_id}/Quit_${quit}`,
+    else
     {
-        method: 'POST',
-        body: JSON.stringify(volanteer_task_result)
-    })
-    volanteer_task=await response.then((res)=> {
+        response=fetch(`Volanteer/Task/result/Id_${window.store.getState().volanteer.id}/Task_Id_${window.store.getState().volanteer.task.task_id}/Quit_${quit}`,
+        {
+            method: 'POST',
+            body: JSON.stringify(volanteer_task_result)
+        })
+    }
+    await response.then((res)=> {
         window.devMode && console.log(res)
         if(window.current_page=="Volanteering")
         {
             window.volanteer_done_counter++
         }
         window.volanteer_done_global_counter++
-        res.json() })
-/*     volanteer_task=await fetch(`/Volanteer/Task/result/Id_${volanteer_id}/Task_Id_${volanteer_task.task_id}/Quit_${quit}`,
+        window.store.dispatch({type:"task done"})
+        })
+/*     volanteer_task=await fetch(`/Volanteer/Task/result/Id_${window.store.getState().volanteer.id}/Task_Id_${volanteer_task.task_id}/Quit_${quit}`,
     {
         method: 'POST',
         body: JSON.stringify(volanteer_task_result)
@@ -218,7 +246,7 @@ export async function volanteer_process_task()
         res.json() })
  */        
         if(window?.store.getState().volanteer?.enabled)
-        window.volanteer_timer_id=setTimeout(volanteer_process_task,VOLANTEER_INTERSPACE_DELAY+volanteer_no_task_counter*1000);  
+        window.volanteer_timer_id=setTimeout(volanteer_get_task,VOLANTEER_INTERSPACE_DELAY+volanteer_no_task_counter*1000);  
 
         if(quit)
         {

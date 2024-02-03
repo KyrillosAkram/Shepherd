@@ -111,31 +111,32 @@ class Volantier():
             return (Literal(new_task_allocated,idial_task)) : integer of response code
         """
         if aTaskId in self.in_progress_q:
+            print(f"finish task {aTaskId}")
             VolantierTasks[aTaskId]["result"]=result
             VolantierTasks[aTaskId]["state" ]="Finished"
             self.in_progress_q.pop(0)
             self.quit_request=quit
             data=jsonify({})
-            if not self.quit_request:
+            if not quit_request:
                 if len(self.emergency_q)>0 :
                     self.in_progress_q.append(self.emergency_q.pop(0))
                 elif len(self.normal_q)>0 :
                     self.in_progress_q.append(self.normal_q.pop(0))
-                data = jsonify( 
-                    {
-                        "type":self.in_progress_q[0]["type"],
-                        "files":1,
-                        "task_id":id
-                    }
-                )
+                # data = jsonify( 
+                #     {
+                #         "type":self.in_progress_q[0]["type"],
+                #         "files":1,
+                #         "task_id":id
+                #     }
+                # )
+                # return data
             else:
                 volantiers_dict.pop(id)
-            return data
                 # else:
                     # currently do nothing# TODO : take task from other volantiers
             # else:
                 # TODO handover volantier tasks
-        return None
+        return #jsonify({"error":f"task {aTaskId} not found"})
 
 
 volantiers_id:List[VolantierId]=[]
@@ -156,7 +157,7 @@ def is_volantier_online(id:volantiers_id)->bool:
 #TODO design function for assgin task that detect most idle the assign him the task 
 def volantiers_id_rotate()->None:
     """rotate the queue"""
-    volantiers_id.append(volantiers_id.pop(volantiers_id[0]))
+    volantiers_id.append(volantiers_id.pop(0))
 
 
 
@@ -321,7 +322,7 @@ def get_task(volantier_id:VolantierId):
         print("Executing exception branch")
         # print(None,GET_OK_NO_CONTENT)
         print(err)
-        return "GET_OK_NO_CONTENT"
+        return jsonify({"invalid_volanteer":volantier_id}),GET_OK
 
 @app.route("/Volanteer/Task/result/Id_<string:id>/Task_Id_<string:task_id>/Quit_<int:quit>",methods=["POST"])
 def volantier_post_task_result(
@@ -329,8 +330,12 @@ def volantier_post_task_result(
     task_id:str,
     quit:int):
     result=request.data
-    _=volantiers_dict[id].finish_task(id=id,aTaskId=task_id,result=result,quit_request=bool(quit))
-    return _
+    print(result)
+    if id in volantiers_dict.keys():
+        volantiers_dict[id].finish_task(id=id,aTaskId=task_id,result=result,quit_request=bool(quit))
+        return "Done"
+    else:
+        return "invalid_volanteer"
 
 @app.route("/Task/state?Id=<string:id>",methods=["GET"])
 def task_get_state(id:str)->Tuple[str,int]:#TODO document this
@@ -400,11 +405,12 @@ if DEBUG:
         @return json
         """
         from pprint import pprint
-        data=jsonify({
+        row_data={
             "VolantierTasks":{ key:{**value,"payload":f'{len(value["payload"])} file'} for key,value in VolantierTasks.items()} ,
             "volantiers_dict":{key:dict(value) for key,value in volantiers_dict.items()}
-        })
-        print(data)
+        }
+        pprint(row_data)
+        data=jsonify(row_data)
         # pprint(request.__dict__)
         # 	response = app.response_class(
         #     response=json.dumps(data),
@@ -414,6 +420,9 @@ if DEBUG:
         # 	print(response)
         return data
     
+    @app.route("/eval",methods=[ "POST" ])
+    def eval_handler():
+        return eval(request.data)
 # from os import chdir,getcwd
 if USED_FORNTEND == "Vanila":
     # print(f"USED FORNTEND == Vanila opertate from {getcwd()}")
